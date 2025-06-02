@@ -43,12 +43,11 @@ class DataProvider(Dataset):
     def get_samples(self):
         hla_header = self.epi_args['hla_header']
         epi_header = self.epi_args['epi_header']
-        tgt_header = self.epi_args['tgt_header']
         fld_header = self.epi_args.get('fld_header', 'Fold')
         seperator = self.epi_args['seperator']
     
         df_epi = pd.read_csv(self.epi_path, sep=seperator)
-        df_epi = df_epi.dropna(subset=[hla_header, epi_header, tgt_header])
+        df_epi = df_epi.dropna(subset=[hla_header, epi_header])
         self.df_epi = df_epi.copy()
         # df_epi[hla_header] = df_epi[hla_header].apply(self.normalize_hla_name)
         # df_epi = df_epi[df_epi[hla_header].isin(self.hla_seq_map)]
@@ -59,7 +58,7 @@ class DataProvider(Dataset):
         if self.num_folds is not None:
             self.fold_indices = [df_epi[df_epi[fld_header] == fold].index.tolist() for fold in range(self.num_folds)]
 
-        samples = list(zip(df_epi[hla_header], df_epi[epi_header], df_epi[tgt_header].astype(float)))
+        samples = list(zip(df_epi[hla_header], df_epi[epi_header]))
         print(f'Number of samples: {len(samples)}') if self.specific_hla is None else None
         if self.shuffle:
             random.shuffle(samples)
@@ -69,13 +68,13 @@ class DataProvider(Dataset):
         return len(self.samples)
 
     def __getitem__(self, idx):
-        hla_name, epi_seq, target = self.samples[idx]
+        hla_name, epi_seq = self.samples[idx]
         if "_" in hla_name:
             hla_name_ = hla_name.split("_")
             hla_seq = (self.hla_seq_map[hla_name_[0]], self.hla_seq_map[hla_name_[1]])
         else:
             hla_seq = self.hla_seq_map[hla_name]
-        return hla_name, epi_seq, target, hla_seq
+        return hla_name, epi_seq, hla_seq
 
 class DataProvider_Cross(Dataset):
     def __init__(
