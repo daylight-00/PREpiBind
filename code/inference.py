@@ -9,6 +9,7 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 import seaborn as sns
 import matplotlib.pyplot as plt
+from functools import partial
 
 from esm.models.esmc import ESMC
 from esm.sdk.api import ESMProtein
@@ -70,24 +71,28 @@ def load_config(config_path, seed=None, fold=None, lr=None, batch_size=None, chk
         print(f"Plot path: {config['plot_path']}")
     return config
 
-def test_model(model, model_esm, dataloader, device):
+def test_model(model, model_esm, dataloader, device, compile=False):
     model.eval()
     all_preds = []
     torch.backends.cudnn.benchmark = True
+
+    def full_model(x_hla, x_epi, mask_hla, mask_epi):
+        x_epi_emb = model_esm(x_epi).embeddings[:, 1:-1, :]
+        y_pred = model(x_hla, x_epi_emb, mask_hla, mask_epi)
+        return y_pred
+    run_model = torch.compile(full_model) if compile else full_model
+    
     with torch.no_grad():
         for batch in tqdm(dataloader, desc="Testing"):
-            x_hla, mask_hla, x_epi, _ = batch
+            x_hla, mask_hla, x_epi, mask_epi = batch
             x_hla = x_hla.to(device, dtype=torch.float16)
+            x_epi = x_epi.to(device, dtype=torch.long)
             mask_hla = mask_hla.to(device, dtype=torch.bool)
-            x_epi = [ESMProtein(sequence=epi).sequence for epi in x_epi]
-            x_epi = model_esm._tokenize(x_epi)
-            x_epi = model_esm(x_epi).embeddings[:,1:-1,:]
-            mask_epi = torch.zeros(*x_epi.shape[:2], dtype=torch.bool, device=device)
-            with torch.amp.autocast('cuda'):
-                y_pred = model(x_hla, x_epi, mask_hla, mask_epi)
-            all_preds.append(y_pred.cpu().numpy())
-    all_preds = np.concatenate(all_preds, axis=0)
-
+            mask_epi = mask_epi.to(device, dtype=torch.bool)
+            with torch.amp.autocast(device.type):
+                y_pred = run_model(x_hla, x_epi, mask_hla, mask_epi)
+            all_preds.append(y_pred.cpu())
+    all_preds = torch.cat(all_preds, dim=0).numpy()
     return all_preds
 
 def main(config):
@@ -118,7 +123,7 @@ def main(config):
     batch_size = config["Test"]["batch_size"] if "batch_size" in config["Test"] else len(dataset)
     num_workers = config["Data"]["num_workers"]
     collate_fn = config.get("collate_fn", None)
-    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers, collate_fn=collate_fn)
+    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers, collate_fn=collate_fn, pin_memory=True)
     y_pred = test_model(model, model_esm, dataloader, device)
 
     ############ Plotting ############
