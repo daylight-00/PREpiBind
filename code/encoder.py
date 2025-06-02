@@ -3,6 +3,8 @@ import numpy as np
 from torch.utils.data import Dataset
 import h5py
 import time
+from esm.tokenization import EsmSequenceTokenizer
+from esm.utils import encoding
 
 #%% PLM
 def get_plm_emb(emb_dict, key, start_idx_a=None, end_idx_a=None, max_retries=5, retry_delay=0.1):
@@ -32,24 +34,26 @@ def split_hla(hla_seq):
         end_idx = None
     return hla_seq, start_idx, end_idx
 
+
 class plm_plm_mask_msa_pair_inf(Dataset):
     def __init__(self, data_provider, hla_emb_path_s, hla_emb_path_p=None):
         self.data_provider = data_provider
         self.hdf5_path_s1 = hla_emb_path_s
         self.hdf5_path_p1 = hla_emb_path_p
         self.hla_emb_dict_s = h5py.File(self.hdf5_path_s1, 'r', libver='latest')
+        self.tokenizer = EsmSequenceTokenizer()
 
     def __len__(self):
         return len(self.data_provider)
 
     def __getitem__(self, idx):
-        hla_name, epi_seq, target, hla_seq = self.data_provider[idx]
+        hla_name, epi_seq, _, _ = self.data_provider[idx]
         hla_name_a, hla_name_b = hla_name.split("_")
         hla_emb_s_a = get_plm_emb(self.hla_emb_dict_s, hla_name_a)
         hla_emb_s_b = get_plm_emb(self.hla_emb_dict_s, hla_name_b)
         hla_emb_s = torch.cat([hla_emb_s_a, hla_emb_s_b], dim=0)
-        target = torch.tensor(target, dtype=torch.float32).unsqueeze(0)
-        return hla_emb_s, epi_seq, target
+        epi_seq = encoding.tokenize_sequence(epi_seq, self.tokenizer, add_special_tokens=True)
+        return hla_emb_s, epi_seq
 
     def __del__(self):
         self.hla_emb_dict_s.close()
