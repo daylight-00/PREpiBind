@@ -7,8 +7,8 @@ import collate as collate
 config = {
     "chkp_name"         : "esmc_small",
     "chkp_path"         : "models",
-    "plot_path"         : "plots",
-    "seed"              : 128,
+    # "plot_path"         : "plots",
+    # "seed"              : 128,
     "model"             : model.plm_cat_mean_inf,
     "model_args"        : {
         "hla_dim_s"       : 960,
@@ -31,8 +31,8 @@ config = {
         },
         "test_path"     : "data/dataset.csv",
         "test_args"     : {
-            "epi_header": 'Epi_Seq',
-            "hla_header": 'HLA_Name',
+            "epi_header": 'Epitope',
+            "hla_header": 'MHC',
             "tgt_header": 'Target',
             "seperator" : ",",
         },
