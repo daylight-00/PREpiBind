@@ -1,0 +1,177 @@
+import sys, os
+sys.path.insert(0, os.getcwd())
+import torch
+import numpy as np
+import importlib.util
+import argparse
+from dataprovider import DataProvider
+from torch.utils.data import DataLoader
+from tqdm import tqdm
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+from esm.models.esmc import ESMC
+from esm.sdk.api import ESMProtein
+
+def parse_lr(s):
+    import re
+    match = re.match(r"(?:(\d*)e(\d+))", s)
+    if not match: raise ValueError(f"Invalid format: {s}")
+    base = match.group(1)
+    exp = match.group(2)
+    base = int(base) if base else 1
+    exponent = int(exp)
+    return base * (10 ** -exponent)
+
+def format_lr(value):
+    if value <= 0:
+        raise ValueError("Value must be positive.")
+    import math
+    exponent = -math.floor(math.log10(value))
+    base = round(value * (10 ** exponent))
+    if base == 1:
+        return f"e{exponent}"
+    else:
+        return f"{base}e{exponent}"
+
+def load_config(config_path, seed=None, fold=None, lr=None, batch_size=None, chkp_path=None, chkp_name=None, plot_path=None, epi_path=None, hla_path=None, test_path=None, bulk_path=False):
+    """Dynamically import the config file."""
+    spec = importlib.util.spec_from_file_location("config", config_path)
+    config_module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(config_module)
+    config = config_module.config
+    # Update config with provided parameters
+    if seed is not None:
+        config["seed"] = seed
+    if fold is not None:
+        config["CrossValidation"]["val_fold"] = fold
+    if lr is not None:
+        config["Train"]["optimizer_args"]["lr"] = parse_lr(lr)
+    if batch_size is not None:
+        config["Train"]["batch_size"] = batch_size
+    if chkp_path is not None:
+        config["chkp_path"] = chkp_path
+    if chkp_name is not None:
+        config["chkp_name"] = chkp_name
+    if plot_path is not None:
+        config["plot_path"] = plot_path
+    if epi_path is not None:
+        config["Data"]["epi_path"] = epi_path
+    if hla_path is not None:
+        config["Data"]["hla_path"] = hla_path
+    if test_path is not None:
+        config["Data"]["test_path"] = test_path
+    if bulk_path:
+        config["chkp_path"] = config["chkp_path"] + "/" + format_lr(config["Train"]["optimizer_args"]["lr"]) + "_s" + str(config["seed"])
+        config["chkp_name"] = config["chkp_name"] + "_fold" + str(config["CrossValidation"]["val_fold"])
+        config["plot_path"] = config["plot_path"] + "/" + format_lr(config["Train"]["optimizer_args"]["lr"]) + "_s" + str(config["seed"])
+        print(f"Checkpoint path: {config['chkp_path']}")
+        print(f"Checkpoint name: {config['chkp_name']}")
+        print(f"Plot path: {config['plot_path']}")
+    return config
+
+def test_model(model, model_esm, dataloader, device):
+    model.eval()
+    all_preds = []
+    torch.backends.cudnn.benchmark = True
+    with torch.no_grad():
+        for batch in tqdm(dataloader, desc="Testing"):
+            x_hla, mask_hla, x_epi, _ = batch
+            x_hla = x_hla.to(device, dtype=torch.float16)
+            mask_hla = mask_hla.to(device, dtype=torch.bool)
+            x_epi = [ESMProtein(sequence=epi).sequence for epi in x_epi]
+            x_epi = model_esm._tokenize(x_epi)
+            x_epi = model_esm(x_epi).embeddings[:,1:-1,:]
+            mask_epi = torch.zeros(*x_epi.shape[:2], dtype=torch.bool, device=device)
+            with torch.amp.autocast('cuda'):
+                y_pred = model(x_hla, x_epi, mask_hla, mask_epi)
+            all_preds.append(y_pred.cpu().numpy())
+    all_preds = np.concatenate(all_preds, axis=0)
+
+    return all_preds
+
+def main(config):
+    model_name = config['chkp_name']
+    plot_path = config['plot_path']
+    os.makedirs(plot_path, exist_ok=True)
+
+    DATA_PROVIDER_ARGS = {
+        "epi_path": config['Data']['test_path'],
+        "epi_args": config['Data']['test_args'],
+        "hla_path": config['Data']['hla_path'],
+        "hla_args": config['Data']['hla_args'],
+    }
+    
+    model_esm = ESMC.from_pretrained("esmc_300m")
+    model = config["model"](**config["model_args"])
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model_path = os.path.join(config["chkp_path"], f"{model_name}-{config['Test']['chkp_prefix']}.pt")
+    checkpoint = torch.load(model_path)
+    model.load_state_dict(checkpoint['model_state_dict'])
+    model = model.to(device, dtype=torch.bfloat16)
+    print(f'Model loaded on {device}')
+
+    data_provider = DataProvider(**DATA_PROVIDER_ARGS)
+    print(f"Datapoints in dataset: {len(data_provider)}")
+
+    dataset = config["encoder"](data_provider, **config["encoder_args"])
+    batch_size = config["Test"]["batch_size"] if "batch_size" in config["Test"] else len(dataset)
+    num_workers = config["Data"]["num_workers"]
+    collate_fn = config.get("collate_fn", None)
+    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers, collate_fn=collate_fn)
+    y_pred = test_model(model, model_esm, dataloader, device)
+
+    ############ Plotting ############
+    df_epi = data_provider.df_epi
+    df_epi['Logits'] = y_pred
+    df_epi['Score'] = df_epi['Logits'].apply(lambda x: 1 / (1 + np.exp(-x)))  # Sigmoid function
+    df_epi.to_csv(os.path.join(plot_path, 'predictions.csv'), index=False)
+
+    plt.figure(figsize=(6, 6))
+    sns.kdeplot(df_epi['Score'], fill=True, color='#29BDFD', alpha=0.6, linewidth=0)
+    plt.title('Kernel Density Plot of Predictions')
+    plt.xlabel('Predictions')
+    plt.ylabel('Density')
+    plt.xlim(-0.18, 1.18)
+    plt.xticks(np.arange(0, 1.01, 0.1))  # x축 tick 지정
+    plt.axvline(x=0.5, color='#F53255', linestyle='--', label='Threshold (0.5)')
+    plt.grid(True, linestyle='-', alpha=0.3)
+    plt.tight_layout()
+    plt.show()
+
+def cli_main():
+    parser = argparse.ArgumentParser(description="Train model with specified config.")
+    parser.add_argument("config_path", type=str, help="Path to the config.py file.")
+    parser.add_argument("--seed", type=int, help="Random seed to use.")
+    parser.add_argument("--fold", type=int, help="Validation fold to use.")
+    parser.add_argument("--lr", type=str, help="Learning rate (e.g., 1e4 for 1e-4).")
+    parser.add_argument("--batch_size", type=int, help="Batch size.")
+    parser.add_argument("--chkp_path", type=str, help="Checkpoint path.")
+    parser.add_argument("--chkp_name", type=str, help="Checkpoint name.")
+    parser.add_argument("--plot_path", type=str, help="Path to save plots.")
+    parser.add_argument("--epi_path", type=str, help="Path to epitope data.")
+    parser.add_argument("--hla_path", type=str, help="Path to HLA data.")
+    parser.add_argument("--test_path", type=str, help="Path to test data.")
+    parser.add_argument("--bulk_path", action="store_true", help="Flag to bulk checkpoint path and name with lr and seed.")
+    
+    args = parser.parse_args()
+
+    config = load_config(
+        config_path=args.config_path,
+        seed=args.seed,
+        fold=args.fold,
+        lr=args.lr,
+        batch_size=args.batch_size,
+        chkp_path=args.chkp_path,
+        chkp_name=args.chkp_name,
+        plot_path=args.plot_path,
+        epi_path=args.epi_path,
+        hla_path=args.hla_path,
+        test_path=args.test_path,
+        bulk_path=args.bulk_path
+    )
+
+    main(config)
+
+if __name__ == "__main__":
+    cli_main()
