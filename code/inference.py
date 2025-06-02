@@ -35,40 +35,31 @@ def format_lr(value):
     else:
         return f"{base}e{exponent}"
 
-def load_config(config_path, seed=None, fold=None, lr=None, batch_size=None, chkp_path=None, chkp_name=None, plot_path=None, epi_path=None, hla_path=None, test_path=None, bulk_path=False):
+def load_config(config_path, batch_size=None, chkp_path=None, chkp_name=None, plot_path=None, hla_path=None, test_path=None, num_workers=None, use_compile=False, plot_kde=False):
     """Dynamically import the config file."""
     spec = importlib.util.spec_from_file_location("config", config_path)
     config_module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(config_module)
     config = config_module.config
     # Update config with provided parameters
-    if seed is not None:
-        config["seed"] = seed
-    if fold is not None:
-        config["CrossValidation"]["val_fold"] = fold
-    if lr is not None:
-        config["Train"]["optimizer_args"]["lr"] = parse_lr(lr)
     if batch_size is not None:
-        config["Train"]["batch_size"] = batch_size
+        config["Test"]["batch_size"] = batch_size
+    if num_workers is not None:
+        config["Data"]["num_workers"] = num_workers
     if chkp_path is not None:
         config["chkp_path"] = chkp_path
     if chkp_name is not None:
         config["chkp_name"] = chkp_name
     if plot_path is not None:
         config["plot_path"] = plot_path
-    if epi_path is not None:
-        config["Data"]["epi_path"] = epi_path
+    if plot_kde:
+        config["Test"]["plot"] = True
+    if use_compile:
+        config["compile"] = True
     if hla_path is not None:
         config["Data"]["hla_path"] = hla_path
     if test_path is not None:
         config["Data"]["test_path"] = test_path
-    if bulk_path:
-        config["chkp_path"] = config["chkp_path"] + "/" + format_lr(config["Train"]["optimizer_args"]["lr"]) + "_s" + str(config["seed"])
-        config["chkp_name"] = config["chkp_name"] + "_fold" + str(config["CrossValidation"]["val_fold"])
-        config["plot_path"] = config["plot_path"] + "/" + format_lr(config["Train"]["optimizer_args"]["lr"]) + "_s" + str(config["seed"])
-        print(f"Checkpoint path: {config['chkp_path']}")
-        print(f"Checkpoint name: {config['chkp_name']}")
-        print(f"Plot path: {config['plot_path']}")
     return config
 
 def test_model(model, model_esm, dataloader, device, compile=False):

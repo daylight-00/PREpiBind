@@ -47,7 +47,7 @@ class plm_plm_mask_msa_pair_inf(Dataset):
         return len(self.data_provider)
 
     def __getitem__(self, idx):
-        hla_name, epi_seq, _, _ = self.data_provider[idx]
+        hla_name, epi_seq, _ = self.data_provider[idx]
         hla_name_a, hla_name_b = hla_name.split("_")
         hla_emb_s_a = get_plm_emb(self.hla_emb_dict_s, hla_name_a)
         hla_emb_s_b = get_plm_emb(self.hla_emb_dict_s, hla_name_b)
