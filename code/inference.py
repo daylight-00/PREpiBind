@@ -35,7 +35,7 @@ def format_lr(value):
     else:
         return f"{base}e{exponent}"
 
-def load_config(config_path, batch_size=None, chkp_path=None, chkp_name=None, plot_path=None, hla_path=None, test_path=None, num_workers=None, use_compile=False, plot_kde=False):
+def load_config(config_path, batch_size=None, chkp_path=None, chkp_name=None, out_path=None, hla_path=None, test_path=None, num_workers=None, use_compile=False, plot = False):
     """Dynamically import the config file."""
     spec = importlib.util.spec_from_file_location("config", config_path)
     config_module = importlib.util.module_from_spec(spec)
@@ -50,12 +50,12 @@ def load_config(config_path, batch_size=None, chkp_path=None, chkp_name=None, pl
         config["chkp_path"] = chkp_path
     if chkp_name is not None:
         config["chkp_name"] = chkp_name
-    if plot_path is not None:
-        config["plot_path"] = plot_path
-    if plot_kde:
+    if out_path is not None:
+        config["out_path"] = out_path
+    if plot:
         config["Test"]["plot"] = True
     if use_compile:
-        config["compile"] = True
+        config["Test"]["use_compile"] = True
     if hla_path is not None:
         config["Data"]["hla_path"] = hla_path
     if test_path is not None:
@@ -88,8 +88,9 @@ def test_model(model, model_esm, dataloader, device, compile=False):
 
 def main(config):
     model_name = config['chkp_name']
-    plot_path = config['plot_path']
-    os.makedirs(plot_path, exist_ok=True)
+    out_path = config['out_path']
+    os.makedirs(out_path, exist_ok=True)
+    use_compile = config.get("use_compile", False)
 
     DATA_PROVIDER_ARGS = {
         "epi_path": config['Data']['test_path'],
@@ -115,14 +116,16 @@ def main(config):
     num_workers = config["Data"]["num_workers"]
     collate_fn = config.get("collate_fn", None)
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers, collate_fn=collate_fn, pin_memory=True)
-    y_pred = test_model(model, model_esm, dataloader, device)
+    y_pred = test_model(model, model_esm, dataloader, device, use_compile=use_compile)
 
     ############ Plotting ############
     df_epi = data_provider.df_epi
     df_epi['Logits'] = y_pred
     df_epi['Score'] = df_epi['Logits'].apply(lambda x: 1 / (1 + np.exp(-x)))  # Sigmoid function
-    df_epi.to_csv(os.path.join(plot_path, 'predictions.csv'), index=False)
-
+    df_epi.to_csv(os.path.join(out_path, f'prediction.csv'), index=False)
+    if not config["Test"].get("plot", False):
+        print("Plotting is disabled in the config.")
+        return
     plt.figure(figsize=(6, 6))
     sns.kdeplot(df_epi['Score'], fill=True, color='#29BDFD', alpha=0.6, linewidth=0)
     plt.title('Kernel Density Plot of Predictions')
@@ -133,6 +136,7 @@ def main(config):
     plt.axvline(x=0.5, color='#F53255', linestyle='--', label='Threshold (0.5)')
     plt.grid(True, linestyle='-', alpha=0.3)
     plt.tight_layout()
+    plt.savefig(os.path.join(out_path, f"plot.png"))
     plt.show()
 
 def cli_main():
@@ -144,7 +148,7 @@ def cli_main():
     parser.add_argument("--batch_size", type=int, help="Batch size.")
     parser.add_argument("--chkp_path", type=str, help="Checkpoint path.")
     parser.add_argument("--chkp_name", type=str, help="Checkpoint name.")
-    parser.add_argument("--plot_path", type=str, help="Path to save plots.")
+    parser.add_argument("--out_path", type=str, help="Path to save plots.")
     parser.add_argument("--epi_path", type=str, help="Path to epitope data.")
     parser.add_argument("--hla_path", type=str, help="Path to HLA data.")
     parser.add_argument("--test_path", type=str, help="Path to test data.")
@@ -160,7 +164,7 @@ def cli_main():
         batch_size=args.batch_size,
         chkp_path=args.chkp_path,
         chkp_name=args.chkp_name,
-        plot_path=args.plot_path,
+        out_path=args.out_path,
         epi_path=args.epi_path,
         hla_path=args.hla_path,
         test_path=args.test_path,

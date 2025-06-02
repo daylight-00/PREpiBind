@@ -1,4 +1,5 @@
 plots
+outputs
 models
 *.pth
 
