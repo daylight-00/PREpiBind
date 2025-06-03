@@ -124,13 +124,10 @@ def main(config):
     df_epi['Logits'] = y_pred
     df_epi['Score'] = df_epi['Logits'].apply(lambda x: 1 / (1 + np.exp(-x)))  # Sigmoid function
     df_epi.to_csv(os.path.join(out_path, f'prediction.csv'), index=False)
-    df_top_10 = df_epi.nlargest(10, 'Score')
-    df_top_10['Score'] = df_top_10['Score'].apply(lambda x: f"{x:.4f}")
-    df_top_10['Logits'] = df_top_10['Logits'].apply(lambda x: f"{x:.4f}")
 
     if not config["Test"].get("plot", False):
         print("Plotting is disabled in the config.")
-        return df_top_10
+        return df_epi
     plt.figure(figsize=(6, 6))
     sns.kdeplot(df_epi['Score'], fill=True, color='#29BDFD', alpha=0.6, linewidth=0)
     plt.title('Kernel Density Plot of Predictions')
@@ -143,7 +140,7 @@ def main(config):
     plt.tight_layout()
     plt.savefig(os.path.join(out_path, f"plot.png"))
     plt.show()
-    return df_top_10
+    return df_epi
 
 def cli_main():
     parser = argparse.ArgumentParser(description="Train model with specified config.")
