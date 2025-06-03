@@ -9,10 +9,9 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 import seaborn as sns
 import matplotlib.pyplot as plt
-from functools import partial
-
+from model import UnifiedModel
+from esm.tokenization import get_esmc_model_tokenizers
 from esm.models.esmc import ESMC
-from esm.sdk.api import ESMProtein
 
 def parse_lr(s):
     import re
@@ -35,7 +34,7 @@ def format_lr(value):
     else:
         return f"{base}e{exponent}"
 
-def load_config(config_path, batch_size=None, chkp_path=None, chkp_name=None, out_path=None, hla_path=None, test_path=None, num_workers=None, use_compile=False, plot = False):
+def load_config(config_path, batch_size=None, chkp_path=None, chkp_name=None, out_path=None, hla_path=None, test_path=None, num_workers=None, use_compile=False, plot=False, hla_emb_path=None):
     """Dynamically import the config file."""
     spec = importlib.util.spec_from_file_location("config", config_path)
     config_module = importlib.util.module_from_spec(spec)
@@ -60,34 +59,43 @@ def load_config(config_path, batch_size=None, chkp_path=None, chkp_name=None, ou
         config["Data"]["hla_path"] = hla_path
     if test_path is not None:
         config["Data"]["test_path"] = test_path
+    if hla_emb_path is not None:
+        config["encoder_args"]["hla_emb_path"] = hla_emb_path
     return config
 
-def test_model(model, model_esm, dataloader, device, compile=False):
-    model.eval()
+def load_unified_model(config, device, use_compile=False):
+    model_esm = ESMC(
+        d_model=960,
+        n_heads=15,
+        n_layers=30,
+        tokenizer=get_esmc_model_tokenizers(),
+        use_flash_attn=True,
+    )
+    model_esm.load_state_dict(torch.load(config['Test']['esm_chkp_path'], map_location=device))
+    model_esm.to(device, dtype=torch.bfloat16).eval()
+    print(f'ESM model loaded on {device}')
+    model = config["model"](**config["model_args"])
+    model.load_state_dict(torch.load(config['Test']['chkp_path'], map_location=device)['model_state_dict'])
+    model.to(device, dtype=torch.bfloat16).eval()
+    print(f'Model loaded on {device}')
+    unified_model = UnifiedModel(model_esm, model).to(device).eval()
+    if use_compile:
+        print("Compiling unified model...")
+        unified_model = torch.compile(unified_model)
+    return unified_model
+
+def test_model(model, dataloader, device):
     all_preds = []
     torch.backends.cudnn.benchmark = True
-
-    def full_model(x_hla, x_epi, mask_hla, mask_epi):
-        x_epi_emb = model_esm(x_epi).embeddings[:, 1:-1, :]
-        y_pred = model(x_hla, x_epi_emb, mask_hla, mask_epi)
-        return y_pred
-    run_model = torch.compile(full_model) if compile else full_model
-    
-    with torch.no_grad():
+    with torch.no_grad(), torch.amp.autocast(device.type):
         for batch in tqdm(dataloader, desc="Testing"):
-            x_hla, mask_hla, x_epi, mask_epi = batch
-            x_hla = x_hla.to(device, dtype=torch.float16)
-            x_epi = x_epi.to(device, dtype=torch.long)
-            mask_hla = mask_hla.to(device, dtype=torch.bool)
-            mask_epi = mask_epi.to(device, dtype=torch.bool)
-            with torch.amp.autocast(device.type):
-                y_pred = run_model(x_hla, x_epi, mask_hla, mask_epi)
+            batch = [item.to(device) for item in batch]
+            y_pred = model(*batch)
             all_preds.append(y_pred.cpu())
     all_preds = torch.cat(all_preds, dim=0).numpy()
     return all_preds
 
 def main(config):
-    model_name = config['chkp_name']
     out_path = config['out_path']
     os.makedirs(out_path, exist_ok=True)
     use_compile = config.get("use_compile", False)
@@ -98,15 +106,6 @@ def main(config):
         "hla_path": config['Data']['hla_path'],
         "hla_args": config['Data']['hla_args'],
     }
-    
-    model_esm = ESMC.from_pretrained("esmc_300m")
-    model = config["model"](**config["model_args"])
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model_path = os.path.join(config["chkp_path"], f"{model_name}-{config['Test']['chkp_prefix']}.pt")
-    checkpoint = torch.load(model_path)
-    model.load_state_dict(checkpoint['model_state_dict'])
-    model = model.to(device, dtype=torch.bfloat16)
-    print(f'Model loaded on {device}')
 
     data_provider = DataProvider(**DATA_PROVIDER_ARGS)
     print(f"Datapoints in dataset: {len(data_provider)}")
@@ -116,16 +115,22 @@ def main(config):
     num_workers = config["Data"]["num_workers"]
     collate_fn = config.get("collate_fn", None)
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers, collate_fn=collate_fn, pin_memory=True)
-    y_pred = test_model(model, model_esm, dataloader, device, use_compile=use_compile)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model = load_unified_model(config, device, use_compile=use_compile)
+    y_pred = test_model(model, dataloader, device)
 
     ############ Plotting ############
     df_epi = data_provider.df_epi
     df_epi['Logits'] = y_pred
     df_epi['Score'] = df_epi['Logits'].apply(lambda x: 1 / (1 + np.exp(-x)))  # Sigmoid function
     df_epi.to_csv(os.path.join(out_path, f'prediction.csv'), index=False)
+    df_top_10 = df_epi.nlargest(10, 'Score')
+    df_top_10['Score'] = df_top_10['Score'].apply(lambda x: f"{x:.4f}")
+    df_top_10['Logits'] = df_top_10['Logits'].apply(lambda x: f"{x:.4f}")
+
     if not config["Test"].get("plot", False):
         print("Plotting is disabled in the config.")
-        return
+        return df_top_10
     plt.figure(figsize=(6, 6))
     sns.kdeplot(df_epi['Score'], fill=True, color='#29BDFD', alpha=0.6, linewidth=0)
     plt.title('Kernel Density Plot of Predictions')
@@ -138,6 +143,7 @@ def main(config):
     plt.tight_layout()
     plt.savefig(os.path.join(out_path, f"plot.png"))
     plt.show()
+    return df_top_10
 
 def cli_main():
     parser = argparse.ArgumentParser(description="Train model with specified config.")

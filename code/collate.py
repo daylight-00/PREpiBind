@@ -15,7 +15,8 @@ def pad_and_mask_collate_fn_inf(batch):
     # HLA_s 처리
     hla_s_lens = [len(emb) for emb in hla_s_list]
     max_hla_len = max(hla_s_lens) if batch_size > 0 else 0
-    padded_hla_s = pad_sequence(hla_s_list, batch_first=True, padding_value=0.0)
+    padded_hla_s = pad_sequence(hla_s_list, batch_first=True, padding_value=0.0).to(torch.float16)
+    padded_hla_s = padded_hla_s
     mask_hla = torch.ones(batch_size, max_hla_len, dtype=torch.bool)
     for i, length in enumerate(hla_s_lens):
         mask_hla[i, :length] = False
@@ -33,7 +34,7 @@ def pad_and_mask_collate_fn_inf(batch):
 
     return (
         padded_hla_s,    # (B, max_hla_len, D_hla)
-        mask_hla,        # (B, max_hla_len) bool
         epi_s_tensor,    # (B, max_epi_len) long
+        mask_hla,        # (B, max_hla_len) bool
         mask_epi         # (B, max_epi_len) bool
     )

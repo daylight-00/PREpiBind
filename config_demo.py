@@ -7,21 +7,17 @@ import collate as collate
 config = {
     "chkp_name"         : "esmc_small",
     "chkp_path"         : "models",
-    # "plot_path"         : "plots",
-    # "seed"              : 128,
     "model"             : model.plm_cat_mean_inf,
     "model_args"        : {
-        "hla_dim_s"       : 960,
-        "hla_dim_p"       : 0,
-        "epi_dim_s"       : 960,
-        "epi_dim_p"       : 0,
-        "head_div"        : 64,
+        "hla_dim"       : 960,
+        "epi_dim"       : 960,
+        "head_div"      : 64,
     },
     "encoder"           : encoder.plm_plm_mask_msa_pair_inf,
     "encoder_args"      : {
-        "hla_emb_path_s" : "data/emb_hla_esmc_small_light_0601.h5",
+        "hla_emb_path"  : "data/emb_hla_esmc_small_light_0601.h5",
     },
-    "collate_fn"         : collate.pad_and_mask_collate_fn_inf,
+    "collate_fn"        : collate.pad_and_mask_collate_fn_inf,
     "Data": {
         "hla_path"      : "data/mhc_mapping.csv",
         "hla_args"      : {
@@ -29,7 +25,7 @@ config = {
             "seq_header": 'HLA_Seq',
             "seperator" : ",",
         },
-        "test_path"     : "data/dataset.csv",
+        "test_path"     : "data/dataset_demo.csv",
         "test_args"     : {
             "epi_header": 'Epitope',
             "hla_header": 'MHC',
@@ -40,7 +36,8 @@ config = {
     },
     "Test": {
         "batch_size"    : 128,
-        "chkp_prefix"   : "best",
+        "chkp_path"     : "models/prepi_esmc_small_e5_s128_f4_bf16.pth",
+        "esm_chkp_path" : "models/esmc_300m_2024_12_v0_bf16.pth",
         "plot"          : True,
     },
 }
