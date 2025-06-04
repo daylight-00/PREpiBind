@@ -2,7 +2,8 @@ plots
 outputs
 models
 *.pth
-emb_hla_esmc_small_0601.h5
+emb_hla_esmc_small_0601_fp16.h5
+emb_hla_esmc_small_0601_bp16.h5
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -36,8 +36,10 @@ config = {
     },
     "Test": {
         "batch_size"    : 128,
-        "chkp_path"     : "models/prepi_esmc_small_e5_s128_f4_bf16.pth",
-        "esm_chkp_path" : "models/esmc_300m_2024_12_v0_bf16.pth",
+        "chkp_path"     : "models/prepi_esmc_small_e5_s128_f4_fp16.pth",
+        "esm_chkp_path" : "models/esmc_300m_2024_12_v0_fp16.pth",
         "plot"          : True,
+        "use_compile"   : True,
+        "out_path"      : "output",
     },
 }
