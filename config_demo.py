@@ -15,7 +15,7 @@ config = {
     },
     "encoder"           : encoder.plm_plm_mask_msa_pair_inf,
     "encoder_args"      : {
-        "hla_emb_path"  : "data/emb_hla_esmc_small_light_0601.h5",
+        "hla_emb_path"  : "data/emb_hla_esmc_small_light_0601_fp16.h5",
     },
     "collate_fn"        : collate.pad_and_mask_collate_fn_inf,
     "Data": {
@@ -32,14 +32,14 @@ config = {
             "tgt_header": 'Target',
             "seperator" : ",",
         },
-        "num_workers"   : 4,
+        "num_workers"   : 8,
     },
     "Test": {
-        "batch_size"    : 128,
+        "batch_size"    : 512,
         "chkp_path"     : "models/prepi_esmc_small_e5_s128_f4_fp16.pth",
         "esm_chkp_path" : "models/esmc_300m_2024_12_v0_fp16.pth",
         "plot"          : True,
-        "use_compile"   : True,
+        "use_compile"   : False,
         "out_path"      : "output",
     },
 }
