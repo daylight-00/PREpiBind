@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 from model import UnifiedModel
 from esm.tokenization import get_esmc_model_tokenizers
 from esm.models.esmc import ESMC
+import time
 
 def parse_lr(s):
     import re
@@ -34,13 +35,12 @@ def format_lr(value):
     else:
         return f"{base}e{exponent}"
 
-def load_config(config_path, batch_size=None, chkp_path=None, chkp_name=None, out_path=None, hla_path=None, test_path=None, num_workers=None, use_compile=False, plot=False, hla_emb_path=None):
+def load_config(config_path, batch_size=None, chkp_path=None, chkp_name=None, out_path=None, hla_path=None, test_path=None, num_workers=None, use_compile=None, plot=None, hla_emb_path=None, esm_chkp_path=None):
     """Dynamically import the config file."""
     spec = importlib.util.spec_from_file_location("config", config_path)
     config_module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(config_module)
     config = config_module.config
-    # Update config with provided parameters
     if batch_size is not None:
         config["Test"]["batch_size"] = batch_size
     if num_workers is not None:
@@ -50,17 +50,19 @@ def load_config(config_path, batch_size=None, chkp_path=None, chkp_name=None, ou
     if chkp_name is not None:
         config["chkp_name"] = chkp_name
     if out_path is not None:
-        config["out_path"] = out_path
-    if plot:
-        config["Test"]["plot"] = True
-    if use_compile:
-        config["Test"]["use_compile"] = True
+        config["Test"]["out_path"] = out_path
+    if plot is not None:
+        config["Test"]["plot"] = plot
+    if use_compile is not None:
+        config["Test"]["use_compile"] = use_compile
     if hla_path is not None:
         config["Data"]["hla_path"] = hla_path
     if test_path is not None:
         config["Data"]["test_path"] = test_path
     if hla_emb_path is not None:
         config["encoder_args"]["hla_emb_path"] = hla_emb_path
+    if esm_chkp_path is not None:
+        config['Test']['esm_chkp_path'] = esm_chkp_path
     return config
 
 def load_unified_model(config, device, use_compile=False):
@@ -71,12 +73,15 @@ def load_unified_model(config, device, use_compile=False):
         tokenizer=get_esmc_model_tokenizers(),
         use_flash_attn=True,
     )
+    # if torch.cuda.is_available() and torch.cuda.is_bf16_supported():
+    #     dtype = torch.bfloat16
+    dtype = torch.float16
     model_esm.load_state_dict(torch.load(config['Test']['esm_chkp_path'], map_location=device))
-    model_esm.to(device, dtype=torch.bfloat16).eval()
+    model_esm.to(device, dtype=dtype).eval()
     print(f'ESM model loaded on {device}')
     model = config["model"](**config["model_args"])
     model.load_state_dict(torch.load(config['Test']['chkp_path'], map_location=device)['model_state_dict'])
-    model.to(device, dtype=torch.bfloat16).eval()
+    model.to(device, dtype=dtype).eval()
     print(f'Model loaded on {device}')
     unified_model = UnifiedModel(model_esm, model).to(device).eval()
     if use_compile:
@@ -87,18 +92,21 @@ def load_unified_model(config, device, use_compile=False):
 def test_model(model, dataloader, device):
     all_preds = []
     torch.backends.cudnn.benchmark = True
-    with torch.no_grad(), torch.amp.autocast(device.type):
+    with torch.no_grad():
+        # start_time = time.time()
         for batch in tqdm(dataloader, desc="Testing"):
             batch = [item.to(device) for item in batch]
             y_pred = model(*batch)
             all_preds.append(y_pred.cpu())
+        # end_time = time.time()
+        # print(f"Time taken: {end_time - start_time}")
     all_preds = torch.cat(all_preds, dim=0).numpy()
     return all_preds
 
 def main(config):
-    out_path = config['out_path']
+    out_path = config["Test"]['out_path']
     os.makedirs(out_path, exist_ok=True)
-    use_compile = config.get("use_compile", False)
+    use_compile = config['Test'].get("use_compile", False)
 
     DATA_PROVIDER_ARGS = {
         "epi_path": config['Data']['test_path'],
@@ -145,33 +153,33 @@ def main(config):
 def cli_main():
     parser = argparse.ArgumentParser(description="Train model with specified config.")
     parser.add_argument("config_path", type=str, help="Path to the config.py file.")
-    parser.add_argument("--seed", type=int, help="Random seed to use.")
-    parser.add_argument("--fold", type=int, help="Validation fold to use.")
-    parser.add_argument("--lr", type=str, help="Learning rate (e.g., 1e4 for 1e-4).")
     parser.add_argument("--batch_size", type=int, help="Batch size.")
     parser.add_argument("--chkp_path", type=str, help="Checkpoint path.")
     parser.add_argument("--chkp_name", type=str, help="Checkpoint name.")
     parser.add_argument("--out_path", type=str, help="Path to save plots.")
-    parser.add_argument("--epi_path", type=str, help="Path to epitope data.")
     parser.add_argument("--hla_path", type=str, help="Path to HLA data.")
     parser.add_argument("--test_path", type=str, help="Path to test data.")
-    parser.add_argument("--bulk_path", action="store_true", help="Flag to bulk checkpoint path and name with lr and seed.")
+    parser.add_argument("--num_workers", type=int, help="Number of workers for DataLoader.")
+    parser.add_argument("--use_compile", action='store_true', help="Use torch.compile for the model.")
+    parser.add_argument("--plot", action='store_true', help="Enable plotting of results.")
+    parser.add_argument("--hla_emb_path", type=str, help="Path to HLA embedding data.")
+    parser.add_argument("--esm_chkp_path", type=str, help="Path to ESM checkpoint.")
     
     args = parser.parse_args()
 
     config = load_config(
         config_path=args.config_path,
-        seed=args.seed,
-        fold=args.fold,
-        lr=args.lr,
         batch_size=args.batch_size,
         chkp_path=args.chkp_path,
         chkp_name=args.chkp_name,
         out_path=args.out_path,
-        epi_path=args.epi_path,
         hla_path=args.hla_path,
         test_path=args.test_path,
-        bulk_path=args.bulk_path
+        num_workers=args.num_workers,
+        use_compile=args.use_compile,
+        plot=args.plot,
+        hla_emb_path=args.hla_emb_path,
+        esm_chkp_path=args.esm_chkp_path
     )
 
     main(config)
