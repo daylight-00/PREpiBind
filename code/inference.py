@@ -93,13 +93,10 @@ def test_model(model, dataloader, device):
     all_preds = []
     torch.backends.cudnn.benchmark = True
     with torch.no_grad():
-        # start_time = time.time()
         for batch in tqdm(dataloader, desc="Testing"):
             batch = [item.to(device) for item in batch]
             y_pred = model(*batch)
             all_preds.append(y_pred.cpu())
-        # end_time = time.time()
-        # print(f"Time taken: {end_time - start_time}")
     all_preds = torch.cat(all_preds, dim=0).numpy()
     return all_preds
 
