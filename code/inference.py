@@ -4,7 +4,7 @@ import torch
 import numpy as np
 import importlib.util
 import argparse
-from dataprovider import DataProvider
+from dataprovider import DataProvider_inf as DataProvider
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 import seaborn as sns
