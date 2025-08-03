@@ -13,9 +13,11 @@ flowchart TD
     
     B --> X[(dataset)]
     X --> C(dataprovider)
-    E --> C
+    C --> E
     D --> F(train)
-    C --> F
+    E --> G(collate)
+    B --> G
+    G --> F
 ```
 
 ## How to run
