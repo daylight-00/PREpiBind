@@ -16,7 +16,7 @@ def get_plm_emb(emb_dict, key, start_idx_a=None, end_idx_a=None, max_retries=5, 
                 embedding = embedding[start_idx_a:end_idx_a]
             return embedding
         except OSError as e:
-            print(f"[get_plm_emb] OSError occured (Attemp {attempt + 1}/{max_retries}) — key: {key}")
+            print(f"[get_plm_emb] OSError occurred (Attempt {attempt + 1}/{max_retries}) — key: {key}")
             print(f"Error message: {e}")
             if attempt < max_retries - 1:
                 time.sleep(retry_delay)

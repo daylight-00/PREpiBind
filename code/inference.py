@@ -1,5 +1,5 @@
 import sys, os
-sys.path.insert(0, os.getcwd())
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import torch
 import numpy as np
 import importlib.util
@@ -12,30 +12,8 @@ import matplotlib.pyplot as plt
 from model import UnifiedModel
 from esm.tokenization import get_esmc_model_tokenizers
 from esm.models.esmc import ESMC
-import time
 
-def parse_lr(s):
-    import re
-    match = re.match(r"(?:(\d*)e(\d+))", s)
-    if not match: raise ValueError(f"Invalid format: {s}")
-    base = match.group(1)
-    exp = match.group(2)
-    base = int(base) if base else 1
-    exponent = int(exp)
-    return base * (10 ** -exponent)
-
-def format_lr(value):
-    if value <= 0:
-        raise ValueError("Value must be positive.")
-    import math
-    exponent = -math.floor(math.log10(value))
-    base = round(value * (10 ** exponent))
-    if base == 1:
-        return f"e{exponent}"
-    else:
-        return f"{base}e{exponent}"
-
-def load_config(config_path, batch_size=None, chkp_path=None, chkp_name=None, out_path=None, hla_path=None, test_path=None, num_workers=None, use_compile=None, plot=None, hla_emb_path=None, esm_chkp_path=None):
+def load_config(config_path, batch_size=None, chkp_path=None, out_path=None, hla_path=None, test_path=None, num_workers=None, use_compile=None, plot=None, hla_emb_path=None, esm_chkp_path=None):
     """Dynamically import the config file."""
     spec = importlib.util.spec_from_file_location("config", config_path)
     config_module = importlib.util.module_from_spec(spec)
@@ -46,9 +24,7 @@ def load_config(config_path, batch_size=None, chkp_path=None, chkp_name=None, ou
     if num_workers is not None:
         config["Data"]["num_workers"] = num_workers
     if chkp_path is not None:
-        config["chkp_path"] = chkp_path
-    if chkp_name is not None:
-        config["chkp_name"] = chkp_name
+        config["Test"]["chkp_path"] = chkp_path
     if out_path is not None:
         config["Test"]["out_path"] = out_path
     if plot is not None:
@@ -73,8 +49,6 @@ def load_unified_model(config, device, use_compile=False):
         tokenizer=get_esmc_model_tokenizers(),
         use_flash_attn=True,
     )
-    # if torch.cuda.is_available() and torch.cuda.is_bf16_supported():
-    #     dtype = torch.bfloat16
     dtype = torch.float16
     model_esm.load_state_dict(torch.load(config['Test']['esm_chkp_path'], map_location=device))
     model_esm.to(device, dtype=dtype).eval()
@@ -124,11 +98,10 @@ def main(config):
     model = load_unified_model(config, device, use_compile=use_compile)
     y_pred = test_model(model, dataloader, device)
 
-    ############ Plotting ############
     df_epi = data_provider.df_epi
     df_epi['Logits'] = y_pred
-    df_epi['Score'] = df_epi['Logits'].apply(lambda x: 1 / (1 + np.exp(-x)))  # Sigmoid function
-    df_epi.to_csv(os.path.join(out_path, f'prediction.csv'), index=False)
+    df_epi['Score'] = df_epi['Logits'].apply(lambda x: 1 / (1 + np.exp(-x)))
+    df_epi.to_csv(os.path.join(out_path, 'prediction.csv'), index=False)
 
     if not config["Test"].get("plot", False):
         print("Plotting is disabled in the config.")
@@ -139,36 +112,34 @@ def main(config):
     plt.xlabel('Predictions')
     plt.ylabel('Density')
     plt.xlim(-0.18, 1.18)
-    plt.xticks(np.arange(0, 1.01, 0.1))  # x축 tick 지정
+    plt.xticks(np.arange(0, 1.01, 0.1))
     plt.axvline(x=0.5, color='#F53255', linestyle='--', label='Threshold (0.5)')
     plt.grid(True, linestyle='-', alpha=0.3)
     plt.tight_layout()
-    plt.savefig(os.path.join(out_path, f"plot.png"))
+    plt.savefig(os.path.join(out_path, "plot.png"))
     plt.show()
     return df_epi
 
 def cli_main():
-    parser = argparse.ArgumentParser(description="Train model with specified config.")
+    parser = argparse.ArgumentParser(description="Run inference with specified config.")
     parser.add_argument("config_path", type=str, help="Path to the config.py file.")
     parser.add_argument("--batch_size", type=int, help="Batch size.")
-    parser.add_argument("--chkp_path", type=str, help="Checkpoint path.")
-    parser.add_argument("--chkp_name", type=str, help="Checkpoint name.")
-    parser.add_argument("--out_path", type=str, help="Path to save plots.")
-    parser.add_argument("--hla_path", type=str, help="Path to HLA data.")
-    parser.add_argument("--test_path", type=str, help="Path to test data.")
+    parser.add_argument("--chkp_path", type=str, help="Path to PREpiBind model checkpoint.")
+    parser.add_argument("--out_path", type=str, help="Path to save output files.")
+    parser.add_argument("--hla_path", type=str, help="Path to HLA mapping CSV.")
+    parser.add_argument("--test_path", type=str, help="Path to input data CSV.")
     parser.add_argument("--num_workers", type=int, help="Number of workers for DataLoader.")
     parser.add_argument("--use_compile", action='store_true', help="Use torch.compile for the model.")
     parser.add_argument("--plot", action='store_true', help="Enable plotting of results.")
-    parser.add_argument("--hla_emb_path", type=str, help="Path to HLA embedding data.")
-    parser.add_argument("--esm_chkp_path", type=str, help="Path to ESM checkpoint.")
-    
+    parser.add_argument("--hla_emb_path", type=str, help="Path to HLA embedding file.")
+    parser.add_argument("--esm_chkp_path", type=str, help="Path to ESM model checkpoint.")
+
     args = parser.parse_args()
 
     config = load_config(
         config_path=args.config_path,
         batch_size=args.batch_size,
         chkp_path=args.chkp_path,
-        chkp_name=args.chkp_name,
         out_path=args.out_path,
         hla_path=args.hla_path,
         test_path=args.test_path,
