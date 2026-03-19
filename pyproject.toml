@@ -1,0 +1,19 @@
+[project]
+name = "prepibind"
+version = "1.0.0"
+description = "PREpiBind: MHC-II peptide binding prediction using protein language models"
+requires-python = ">=3.10"
+dependencies = [
+    "torch>=2.0",
+    "numpy",
+    "pandas",
+    "h5py",
+    "matplotlib",
+    "seaborn",
+    "tqdm",
+    "esm",
+    "huggingface_hub",
+]
+
+[tool.uv]
+dev-dependencies = []

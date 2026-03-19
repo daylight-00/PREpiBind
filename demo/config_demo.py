@@ -1,12 +1,8 @@
-import torch.nn as nn
-import torch.optim as optim
-import model as model                       # Change here if you have a different `model.py` file
-import encoder as encoder                   # Change here if you have a different `encoder.py` file
+import model as model
+import encoder as encoder
 import collate as collate
 
 config = {
-    "chkp_name"         : "esmc_small",
-    "chkp_path"         : "models",
     "model"             : model.plm_cat_mean_inf,
     "model_args"        : {
         "hla_dim"       : 960,
@@ -19,18 +15,17 @@ config = {
     },
     "collate_fn"        : collate.pad_and_mask_collate_fn_inf,
     "Data": {
-        "hla_path"      : "data/mhc_mapping.csv",
+        "hla_path"      : "data/mhc_mapping_light.csv",
         "hla_args"      : {
             "hla_header": 'HLA_Name',
             "seq_header": 'HLA_Seq',
-            "seperator" : ",",
+            "separator" : ",",
         },
         "test_path"     : "data/dataset_demo.csv",
         "test_args"     : {
             "epi_header": 'Epitope',
             "hla_header": 'MHC',
-            "tgt_header": 'Target',
-            "seperator" : ",",
+            "separator" : ",",
         },
         "num_workers"   : 8,
     },
