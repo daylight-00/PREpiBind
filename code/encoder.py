@@ -107,7 +107,7 @@ class blosum_mask_msa_pair(Dataset):
             hla_emb_s_b = get_blosum_emb(self.blosum62, hla_seq_b, start_idx_b, end_idx_b)
             hla_emb_s = torch.cat([hla_emb_s_a, hla_emb_s_b], dim=0)
         else:
-            hla_seq, start_idx, end_idx = split_hla
+            hla_seq, start_idx, end_idx = split_hla(hla_seq)
             hla_emb_s = get_blosum_emb(self.blosum62, hla_seq, start_idx, end_idx)
         epi_emb_s = get_blosum_emb(self.blosum62, epi_seq)
         hla_emb_p = False
