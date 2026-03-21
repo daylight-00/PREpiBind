@@ -133,7 +133,6 @@ def cli_main():
     parser.add_argument("--plot", action='store_true', help="Enable plotting of results.")
     parser.add_argument("--hla_emb_path", type=str, help="Path to HLA embedding file.")
     parser.add_argument("--esm_chkp_path", type=str, help="Path to ESM model checkpoint.")
-
     args = parser.parse_args()
 
     config = load_config(

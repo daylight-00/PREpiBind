@@ -11,11 +11,11 @@ config = {
     },
     "encoder"           : encoder.plm_plm_mask_msa_pair_inf,
     "encoder_args"      : {
-        "hla_emb_path"  : "data/emb_hla_esmc_small_light_0601_fp16.h5",
+        "hla_emb_path"  : "data/emb_hla_esmc_small_0601_fp16.h5",
     },
     "collate_fn"        : collate.pad_and_mask_collate_fn_inf,
     "Data": {
-        "hla_path"      : "data/mhc_mapping_light.csv",
+        "hla_path"      : "data/mhc_mapping.csv",
         "hla_args"      : {
             "hla_header": 'HLA_Name',
             "seq_header": 'HLA_Seq',
@@ -35,6 +35,6 @@ config = {
         "esm_chkp_path" : "models/esmc_300m_2024_12_v0_fp16.pth",
         "plot"          : True,
         "use_compile"   : False,
-        "out_path"      : "output",
+        "out_path"      : "outputs",
     },
 }
