@@ -49,15 +49,16 @@ class plm_cat_mean_inf(nn.Module):
         self.epi_self_attn = simple_self_attn(embed_dim=epi_dim, num_heads=nhead, n_blocks=epi_blocks, dropout=dropout)
         self.hla_self_attn = simple_self_attn(embed_dim=hla_dim, num_heads=nhead, n_blocks=hla_blocks, dropout=dropout)
         
-        embed_dim = hla_dim
-        nhead = embed_dim // head_div
-        self.self_attn = simple_self_attn(embed_dim=embed_dim, num_heads=nhead, n_blocks=con_blocks, dropout=dropout)
+        concat_dim = hla_dim
+        nhead = concat_dim // head_div
+        self.self_attn = simple_self_attn(embed_dim=concat_dim, num_heads=nhead, n_blocks=con_blocks, dropout=dropout)
 
+        flat_dim = concat_dim
         self.output_layer = nn.Sequential(
-            nn.Linear(embed_dim, embed_dim//2),
+            nn.Linear(flat_dim, flat_dim//2),
             nn.GELU(),
             nn.Dropout(dropout),
-            nn.Linear(embed_dim//2, 1)
+            nn.Linear(flat_dim//2, 1)
         )
 
     def forward(self, x_hla, x_epi, mask_hla=None, mask_epi=None):

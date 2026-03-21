@@ -126,7 +126,7 @@ def pad_and_mask_collate_fn_inf(batch):
         mask_hla[i, :length] = False
 
     # Pad epitope token sequences
-    pad_token_id = EsmSequenceTokenizer().pad_token_id
+    pad_token_id = tokenizer.pad_token_id
     max_epi_len = max(len(x) for x in epi_list)
     epi_tensor = torch.full((batch_size, max_epi_len), pad_token_id, dtype=torch.long)
     mask_epi = torch.ones(batch_size, max_epi_len, dtype=torch.bool)

@@ -1,3 +1,5 @@
+import random
+import re
 import pandas as pd
 from torch.utils.data import Dataset
 
@@ -6,11 +8,17 @@ class DataProvider(Dataset):
             self,
             epi_path, epi_args,
             hla_path, hla_args,
+            shuffle=False,
+            specific_hla=None,
+            num_folds=None,
             ):
         self.epi_path = epi_path
         self.epi_args = epi_args
         self.hla_path = hla_path
         self.hla_args = hla_args
+        self.shuffle = shuffle
+        self.specific_hla = specific_hla
+        self.num_folds = num_folds
         self.hla_seq_map = self.make_hla_seq_map()
         self.samples = self.get_samples()
 
@@ -31,9 +39,9 @@ class DataProvider(Dataset):
         epi_header = self.epi_args['epi_header']
         tgt_header = self.epi_args['tgt_header']
         fld_header = self.epi_args.get('fld_header', 'Fold')
-        seperator = self.epi_args['seperator']
-    
-        df_epi = pd.read_csv(self.epi_path, sep=seperator)
+        separator = self.epi_args['separator']
+
+        df_epi = pd.read_csv(self.epi_path, sep=separator)
         df_epi = df_epi.dropna(subset=[hla_header, epi_header, tgt_header])
         self.df_epi = df_epi.copy()
 
@@ -45,7 +53,7 @@ class DataProvider(Dataset):
         if self.shuffle:
             random.shuffle(samples)
         return samples
-        
+
     def __len__(self):
         return len(self.samples)
 
@@ -84,9 +92,9 @@ class DataProvider_inf(Dataset):
     def make_hla_seq_map(self):
         hla_header = self.hla_args['hla_header']
         seq_header = self.hla_args['seq_header']
-        seperator = self.hla_args['seperator']
+        separator = self.hla_args['separator']
 
-        df_hla = pd.read_csv(self.hla_path, sep=seperator)
+        df_hla = pd.read_csv(self.hla_path, sep=separator)
         df_hla = df_hla.dropna(subset=[hla_header, seq_header])
         hla_seq_map = dict(zip(df_hla[hla_header], df_hla[seq_header]))
         print(f'Number of HLA alleles: {len(hla_seq_map)}')
