@@ -21,10 +21,10 @@ config = {
 
     "encoder"           : encoder.plm_plm_mask,
     "encoder_args"      : {
-        "hla_emb_path_s" : "emb/emb_hla_af3_single_0430.h5",
-        "epi_emb_path_s" : "emb/emb_epi_af3_single_0430.h5",
-        "hla_emb_path_p" : "emb/emb_hla_af3_pair_side_0430.h5",
-        "epi_emb_path_p" : "emb/emb_epi_af3_pair_side_0430.h5",
+        "hla_emb_path_s" : "../emb/emb_hla_af3_single.h5",
+        "epi_emb_path_s" : "../emb/emb_epi_af3_single.h5",
+        "hla_emb_path_p" : "../emb/emb_hla_af3_pair_side.h5",
+        "epi_emb_path_p" : "../emb/emb_epi_af3_pair_side.h5",
     },
     "CrossValidation": {
         "num_folds"     : 5,
