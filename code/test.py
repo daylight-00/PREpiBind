@@ -10,7 +10,7 @@ from tqdm import tqdm
 from plot import plot_general_curves, plot_top_10_curves
 import h5py
 import re
-from sklearn.metrics import roc_auc_score, f1_score, balanced_accuracy_score, precision_score, precision_recall_curve, auc, matthews_corrcoef
+from sklearn.metrics import roc_auc_score, f1_score, accuracy_score, precision_score, precision_recall_curve, auc, matthews_corrcoef
 import pandas as pd
 
 def parse_lr(s):
@@ -102,7 +102,7 @@ def test_model(model, dataloader, device, target_layer=None):
     return all_preds, all_features
 
 def calculate_metrics(predictions, targets, threshold=0.5):
-    """    Calculate classification metrics: AUC, F1 Score, Balanced Accuracy (BACC), and Precision."""
+    """Calculate classification metrics: AUC, F1 Score, Accuracy, Precision, and MCC."""
     predictions = predictions.flatten()
     targets = targets.flatten()
     binary_preds = (predictions >= threshold).astype(int)
@@ -110,16 +110,16 @@ def calculate_metrics(predictions, targets, threshold=0.5):
     precision_vals, recall_vals, _ = precision_recall_curve(targets, predictions)
     pr_auc = auc(recall_vals, precision_vals)
     f1 = f1_score(targets, binary_preds)
-    bacc = balanced_accuracy_score(targets, binary_preds)
+    acc = accuracy_score(targets, binary_preds)
     precision = precision_score(targets, binary_preds)
-    mcc = matthews_corrcoef(targets, binary_preds)  # MCC 계산
+    mcc = matthews_corrcoef(targets, binary_preds)
     return {
         "ROC_AUC": roc_auc,
         "PR_AUC": pr_auc,
         "F1": f1,
-        "BACC": bacc,
+        "Accuracy": acc,
         "Precision": precision,
-        "MCC": mcc  # 반환값에 추가
+        "MCC": mcc,
     }
 
 def main(config):

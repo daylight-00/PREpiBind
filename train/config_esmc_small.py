@@ -2,6 +2,7 @@ import torch.nn as nn
 import torch.optim as optim
 import model as model                       # Change here if you have a different `model.py` file
 import encoder as encoder                   # Change here if you have a different `encoder.py` file
+import collate as collate
 
 config = {
     "chkp_name"         : "esmc_small",
@@ -19,13 +20,14 @@ config = {
         "head_div"        : 64,
     },
 
-    "encoder"           : encoder.plm_plm_mask,
+    "encoder"           : encoder.plm_plm_mask_msa_pair,
     "encoder_args"      : {
         "hla_emb_path_s" : "../emb/emb_hla_esmc_small.h5",
         "epi_emb_path_s" : "../emb/emb_epi_esmc_small.h5",
         # "hla_emb_path_p" : "",
         # "epi_emb_path_p" : "",
     },
+    "collate_fn"        : collate.pad_and_mask_collate_fn,
     "CrossValidation": {
         "num_folds"     : 5,
     },

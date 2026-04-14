@@ -7,7 +7,7 @@ from tqdm import tqdm
 from multiprocessing import Pool, Lock, cpu_count
 import time
 
-input_path = '../../data/mhc_mapping/HLA2_IMGT_light.csv'
+input_path = '../../data/mhc_mapping/mhc_mapping_light.csv'
 # input_path = '../../data/unique_epitope_whole.csv'
 data = pd.read_csv(input_path)
 output_path = 'emb_hla_esm3_small.h5'

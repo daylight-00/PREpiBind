@@ -5,7 +5,7 @@ from esm.sdk.api import ESMProtein, LogitsConfig
 import h5py
 from tqdm import tqdm
 
-input_path = '../../data/mhc_mapping/HLA2_IMGT_light.csv'
+input_path = '../../data/mhc_mapping/mhc_mapping_light.csv'
 # input_path = '../../data/unique_epitope_whole.csv'
 data = pd.read_csv(input_path)
 total_sequences = len(data)
