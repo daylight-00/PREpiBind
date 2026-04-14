@@ -2,8 +2,8 @@
 
 ![banner](banner.png)
 
-> **PREpiBind: Protein Language Model-based MHC Class II Epitope Binding Prediction**
-> Hyunyoo Jang et al. *bioRxiv* (2025) — Paper (coming soon) · [HuggingFace Models](https://huggingface.co/daylight00/prepibind-esmc-300m)
+> **PREpiBind: Protein Representation-integrated Epitope-MHC Class II Binding Prediction**
+> David Hyunyoo Jang et al. *bioRxiv* (2026) — Paper (coming soon) · [HuggingFace Models](https://huggingface.co/daylight00/prepibind-esmc-300m)
 
 PREpiBind predicts MHC class II–peptide binding by leveraging pre-trained protein language model (PLM) representations. It encodes epitope sequences on-the-fly with [ESMC 300M](https://huggingface.co/daylight00/esmc-300m-2024-12) and uses pre-computed HLA embeddings for both alpha and beta chains, feeding them into a lightweight cross-attention architecture to produce a binding score.
 
@@ -163,11 +163,11 @@ A CUDA-capable GPU is strongly recommended.
 If you use PREpiBind in your work, please cite:
 
 ```bibtex
-@article{jang2025prepibind,
-  title   = {PREpiBind: Protein Language Model-based MHC Class II Epitope Binding Prediction},
-  author  = {Jang, Hyunyoo and others},
+@article{jang2026prepibind,
+  title   = {PREpiBind: Protein Representation-integrated Epitope-MHC Class II Binding Prediction},
+  author  = {Jang, David Hyunyoo and others},
   journal = {bioRxiv},
-  year    = {2025},
+  year    = {2026},
   doi     = {10.1101/XXXX}
 }
 ```
