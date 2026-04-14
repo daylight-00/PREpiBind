@@ -3,9 +3,9 @@
 ![banner](banner.png)
 
 > **PREpiBind: Protein Representation-integrated Epitope-MHC Class II Binding Prediction**
-> David Hyunyoo Jang et al. *bioRxiv* (2026) — Paper (coming soon) · [HuggingFace Models](https://huggingface.co/daylight-00/prepibind-esmc-300m)
+> David Hyunyoo Jang, Dongwoo Kim, Byungho Park, Untaek Hwang, Yoonjoo Choi, Juyong Lee. *bioRxiv* (2026) — Paper (coming soon) · [HuggingFace Models](https://huggingface.co/daylight-00/prepibind-esmc-300m)
 
-PREpiBind predicts MHC class II–peptide binding by leveraging pre-trained protein language model (PLM) representations. It encodes epitope sequences on-the-fly with [ESMC 300M](https://huggingface.co/daylight-00/esmc-300m-2024-12) and uses pre-computed HLA embeddings for both alpha and beta chains, feeding them into a lightweight cross-attention architecture to produce a binding score.
+PREpiBind predicts MHC class II–peptide binding by leveraging pre-trained protein language model (PLM) representations. It encodes epitope sequences on-the-fly with [ESMC 300M](https://huggingface.co/daylight-00/esmc-300m-2024-12) and uses pre-computed HLA embeddings for both alpha and beta chains, feeding them into a lightweight self-attention architecture to produce a binding score.
 
 ---
 
@@ -176,7 +176,7 @@ If you use PREpiBind in your work, please cite:
 ```bibtex
 @article{jang2026prepibind,
   title   = {PREpiBind: Protein Representation-integrated Epitope-MHC Class II Binding Prediction},
-  author  = {Jang, David Hyunyoo and others},
+  author  = {Jang, David Hyunyoo and Kim, Dongwoo and Park, Byungho and Hwang, Untaek and Choi, Yoonjoo and Lee, Juyong},
   journal = {bioRxiv},
   year    = {2026},
   doi     = {10.1101/XXXX}

@@ -13,6 +13,7 @@ dependencies = [
     "tqdm",
     "esm",
     "huggingface_hub",
+    "scikit-learn",
 ]
 
 [tool.uv]

@@ -49,7 +49,7 @@ def run_jackhmmer(db_name,h, input_sequence, output_dir):
     except Exception as e:
         return f"An unexpected error occurred: {str(e)}"
 
-input_path = '../../data/mhc_mapping/HLA2_IMGT_light.csv'
+input_path = '../../data/mhc_mapping/mhc_mapping_light.csv'
 df = pd.read_csv(input_path)
 input_dir = 'input'
 output_base_dir = 'output'

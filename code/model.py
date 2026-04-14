@@ -37,6 +37,50 @@ class simple_self_attn(nn.Module):
             x = block(x, padding_mask)
         return x
 
+class plm_cat_mean(nn.Module):
+    def __init__(
+            self,
+            hla_dim_s=384, epi_dim_s=384, hla_dim_p=384, epi_dim_p=384,
+            dropout=0.1, hla_blocks=2, epi_blocks=2, con_blocks=1, head_div=64
+        ):
+        super(plm_cat_mean, self).__init__()
+        self.pair = False if hla_dim_p == 0 and epi_dim_p == 0 else True
+
+        hla_dim = hla_dim_s + hla_dim_p
+        epi_dim = epi_dim_s + epi_dim_p
+        nhead = hla_dim // head_div
+        self.epi_self_attn = simple_self_attn(embed_dim=epi_dim, num_heads=nhead, n_blocks=epi_blocks, dropout=dropout)
+        self.hla_self_attn = simple_self_attn(embed_dim=hla_dim, num_heads=nhead, n_blocks=hla_blocks, dropout=dropout)
+
+        concat_dim = hla_dim
+        nhead = concat_dim // head_div
+        self.self_attn = simple_self_attn(embed_dim=concat_dim, num_heads=nhead, n_blocks=con_blocks, dropout=dropout)
+
+        flat_dim = concat_dim
+        self.output_layer = nn.Sequential(
+            nn.Linear(flat_dim, flat_dim//2),
+            nn.GELU(),
+            nn.Dropout(dropout),
+            nn.Linear(flat_dim//2, 1)
+        )
+
+    def forward(self, x_hla_s, x_hla_p, x_epi_s, x_epi_p, mask_hla=None, mask_epi=None):
+        x_hla = torch.cat([x_hla_s, x_hla_p], dim=-1) if self.pair else x_hla_s
+        x_hla = self.hla_self_attn(x_hla, padding_mask=mask_hla)
+
+        x_epi = torch.cat([x_epi_s, x_epi_p], dim=-1) if self.pair else x_epi_s
+        x_epi = self.epi_self_attn(x_epi, padding_mask=None)
+
+        mask = torch.cat((mask_hla, mask_epi), dim=-1)
+        x = torch.cat((x_hla, x_epi), dim=1)
+        x = self.self_attn(x, padding_mask=mask)
+
+        mask = (~mask).unsqueeze(-1)
+        x = x*mask
+        x = x.sum(dim=1) / (mask.sum(dim=1))
+        x = self.output_layer(x)
+        return x
+
 class plm_cat_mean_inf(nn.Module):
     def __init__(
             self,

@@ -4,7 +4,7 @@ type: software
 title: "PREpiBind: Protein Representation-integrated Epitope-MHC Class II Binding Prediction"
 authors:
   - family-names: Jang
-    given-names: Hyunyoo
+    given-names: David Hyunyoo
 repository-code: "https://github.com/daylight-00/PREpiBind"
 license: MIT
 version: 1.0.0
@@ -12,10 +12,20 @@ year: 2025
 
 preferred-citation:
   type: article
-  title: "PREpiBind: Protein Language Model-based MHC Class II Epitope Binding Prediction"
+  title: "PREpiBind: Protein Representation-integrated Epitope-MHC Class II Binding Prediction"
   authors:
     - family-names: Jang
-      given-names: Hyunyoo
-  journal: "Bioinformatics"
-  year: 2025
+      given-names: David Hyunyoo
+    - family-names: Kim
+      given-names: Dongwoo
+    - family-names: Park
+      given-names: Byungho
+    - family-names: Hwang
+      given-names: Untaek
+    - family-names: Choi
+      given-names: Yoonjoo
+    - family-names: Lee
+      given-names: Juyong
+  journal: "bioRxiv"
+  year: 2026
   doi: "XXXX"

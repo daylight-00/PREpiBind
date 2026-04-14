@@ -246,7 +246,7 @@ def train_model(model, train_loader, val_loader, criterion, optimizer, device, l
 
         avg_val_loss = val_loss / total_val
         val_acc = correct_val / total_val
-        val_roc_auc = roc_auc_score(all_targets.view(-1), all_outputs.view(-1))
+        val_roc_auc = roc_auc_score(all_outputs.view(-1), all_targets.view(-1))
         epoch_time = int(time.time() - start_time)
         logging.info(f'\
 [{model_path}]-[Epoch {epoch:03d}/{num_epochs:03d}] - \

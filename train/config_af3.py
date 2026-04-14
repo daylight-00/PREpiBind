@@ -2,6 +2,7 @@ import torch.nn as nn
 import torch.optim as optim
 import model as model                       # Change here if you have a different `model.py` file
 import encoder as encoder                   # Change here if you have a different `encoder.py` file
+import collate as collate
 
 config = {
     "chkp_name"         : "af3",
@@ -19,13 +20,14 @@ config = {
         "head_div"        : 64,
     },
 
-    "encoder"           : encoder.plm_plm_mask,
+    "encoder"           : encoder.plm_plm_mask_msa_pair,
     "encoder_args"      : {
         "hla_emb_path_s" : "../emb/emb_hla_af3_single.h5",
         "epi_emb_path_s" : "../emb/emb_epi_af3_single.h5",
         "hla_emb_path_p" : "../emb/emb_hla_af3_pair_side.h5",
         "epi_emb_path_p" : "../emb/emb_epi_af3_pair_side.h5",
     },
+    "collate_fn"        : collate.pad_and_mask_collate_fn,
     "CrossValidation": {
         "num_folds"     : 5,
     },
