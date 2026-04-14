@@ -2,6 +2,7 @@ plots
 outputs
 models
 *.pth
+emb/*h5
 emb_hla_esmc_small_0601_fp16.h5
 emb_hla_esmc_small_0601_bp16.h5
 

@@ -3,9 +3,9 @@
 ![banner](banner.png)
 
 > **PREpiBind: Protein Representation-integrated Epitope-MHC Class II Binding Prediction**
-> David Hyunyoo Jang et al. *bioRxiv* (2026) — Paper (coming soon) · [HuggingFace Models](https://huggingface.co/daylight00/prepibind-esmc-300m)
+> David Hyunyoo Jang et al. *bioRxiv* (2026) — Paper (coming soon) · [HuggingFace Models](https://huggingface.co/daylight-00/prepibind-esmc-300m)
 
-PREpiBind predicts MHC class II–peptide binding by leveraging pre-trained protein language model (PLM) representations. It encodes epitope sequences on-the-fly with [ESMC 300M](https://huggingface.co/daylight00/esmc-300m-2024-12) and uses pre-computed HLA embeddings for both alpha and beta chains, feeding them into a lightweight cross-attention architecture to produce a binding score.
+PREpiBind predicts MHC class II–peptide binding by leveraging pre-trained protein language model (PLM) representations. It encodes epitope sequences on-the-fly with [ESMC 300M](https://huggingface.co/daylight-00/esmc-300m-2024-12) and uses pre-computed HLA embeddings for both alpha and beta chains, feeding them into a lightweight cross-attention architecture to produce a binding score.
 
 ---
 
@@ -46,13 +46,13 @@ The ESMC backbone is always required. Download only the PREpiBind checkpoint you
 from huggingface_hub import hf_hub_download
 
 # Required: ESMC backbone
-hf_hub_download(repo_id="daylight00/esmc-300m-2024-12",   filename="esmc_300m_2024_12_v0_fp16.pth",                  local_dir="models")
+hf_hub_download(repo_id="daylight-00/esmc-300m-2024-12",   filename="esmc_300m_2024_12_v0_fp16.pth",                  local_dir="models")
 
 # PREpiBind checkpoint — download the one(s) you need
-hf_hub_download(repo_id="daylight00/prepibind-esmc-300m", filename="prepi_esmc_small_e5_s128_f4_fp16.pth",           local_dir="models")  # qualitative (default)
-hf_hub_download(repo_id="daylight00/prepibind-esmc-300m", filename="prepi_esmc_small_ms_e5_s100_f0_fp16.pth",        local_dir="models")  # mass spectrometry
-hf_hub_download(repo_id="daylight00/prepibind-esmc-300m", filename="prepi_esmc_small_ic50_500_e5_s128_f4_fp16.pth",  local_dir="models")  # IC50 < 500 nM
-hf_hub_download(repo_id="daylight00/prepibind-esmc-300m", filename="prepi_esmc_small_ic50_1000_e5_s128_f1_fp16.pth", local_dir="models")  # IC50 < 1000 nM
+hf_hub_download(repo_id="daylight-00/prepibind-esmc-300m", filename="prepi_esmc_small_e5_s128_f4_fp16.pth",           local_dir="models")  # qualitative (default)
+hf_hub_download(repo_id="daylight-00/prepibind-esmc-300m", filename="prepi_esmc_small_ms_e5_s100_f0_fp16.pth",        local_dir="models")  # mass spectrometry
+hf_hub_download(repo_id="daylight-00/prepibind-esmc-300m", filename="prepi_esmc_small_ic50_500_e5_s128_f4_fp16.pth",  local_dir="models")  # IC50 < 500 nM
+hf_hub_download(repo_id="daylight-00/prepibind-esmc-300m", filename="prepi_esmc_small_ic50_1000_e5_s128_f1_fp16.pth", local_dir="models")  # IC50 < 1000 nM
 ```
 
 #### 3. Run inference
@@ -133,7 +133,7 @@ See `demo/data/dataset_demo.csv` for a full example (48,352 samples).
 To use the full allele set, download the embedding file and update `hla_emb_path` and `hla_path` in your config:
 
 ```python
-hf_hub_download(repo_id="daylight00/prepibind-esmc-300m", filename="emb_hla_esmc_small_0601_fp16.h5", local_dir="data")
+hf_hub_download(repo_id="daylight-00/prepibind-esmc-300m", filename="emb_hla_esmc_small_0601_fp16.h5", local_dir="data")
 ```
 
 ---
@@ -155,6 +155,17 @@ A CUDA-capable GPU is strongly recommended.
 |---------------------------|--------------------------------------------------------------------|
 | `outputs/prediction.csv`  | Input data with appended `Logits` and `Score` (sigmoid) columns    |
 | `outputs/plot.png`        | KDE distribution of prediction scores (generated with `--plot`)    |
+
+---
+
+## Training & Embedding Generation
+
+To train PREpiBind from scratch or reproduce results, see:
+
+- **[`emb/`](emb/)** — Scripts to generate protein embeddings from multiple backends (ESMC, ESM3, AlphaFold3, Boltz, Chai-Lab)
+- **[`train/`](train/)** — Training configs, scripts, and workflow documentation
+
+The general pipeline is: **generate embeddings** → **train model** → **evaluate**.
 
 ---
 

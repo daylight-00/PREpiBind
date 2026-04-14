@@ -21,8 +21,8 @@ config = {
 
     "encoder"           : encoder.plm_plm_mask,
     "encoder_args"      : {
-        "hla_emb_path_s" : "emb/emb_hla_esmc_small_0430.h5",
-        "epi_emb_path_s" : "emb/emb_epi_esmc_small_0430.h5",
+        "hla_emb_path_s" : "../emb/emb_hla_esmc_small.h5",
+        "epi_emb_path_s" : "../emb/emb_epi_esmc_small.h5",
         # "hla_emb_path_p" : "",
         # "epi_emb_path_p" : "",
     },
