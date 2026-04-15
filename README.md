@@ -5,7 +5,7 @@
 > **PREpiBind: Protein Representation-integrated Epitope-MHC Class II Binding Prediction**
 > David Hyunyoo Jang, Dongwoo Kim, Byungho Park, Untaek Hwang, Yoonjoo Choi, Juyong Lee. *bioRxiv* (2026) — Paper (coming soon) · [HuggingFace Models](https://huggingface.co/daylight-00/prepibind-esmc-300m)
 
-PREpiBind predicts MHC class II–peptide binding by leveraging pre-trained protein language model (PLM) representations. It encodes epitope sequences on-the-fly with [ESMC 300M](https://huggingface.co/daylight-00/esmc-300m-2024-12) and uses pre-computed HLA embeddings for both alpha and beta chains, feeding them into a lightweight self-attention architecture to produce a binding score.
+PREpiBind predicts MHC class II–peptide binding by leveraging pre-trained protein language model (PLM) representations. It encodes epitope sequences on-the-fly with [ESM C 300M](https://huggingface.co/daylight-00/esmc-300m-2024-12) and uses pre-computed HLA embeddings for both alpha and beta chains, feeding them into a lightweight self-attention architecture to produce a binding score.
 
 ---
 
@@ -40,12 +40,12 @@ uv sync
 
 #### 2. Download model weights
 
-The ESMC backbone is always required. Download only the PREpiBind checkpoint you intend to use (default: `config_demo.py` → qualitative). See [Available Models](#available-models) for the full list.
+The ESM C backbone is always required. Download only the PREpiBind checkpoint you intend to use (default: `config_demo.py` → qualitative). See [Available Models](#available-models) for the full list.
 
 ```python
 from huggingface_hub import hf_hub_download
 
-# Required: ESMC backbone
+# Required: ESM C backbone
 hf_hub_download(repo_id="daylight-00/esmc-300m-2024-12",   filename="esmc_300m_2024_12_v0_fp16.pth",                  local_dir="models")
 
 # PREpiBind checkpoint — download the one(s) you need
@@ -82,7 +82,7 @@ options:
   --hla_path            Path to HLA mapping CSV
   --hla_emb_path        Path to HLA embedding HDF5 file
   --chkp_path           Path to PREpiBind model checkpoint
-  --esm_chkp_path       Path to ESMC model checkpoint
+  --esm_chkp_path       Path to ESM C model checkpoint
   --out_path            Path to save output files
   --num_workers         Number of DataLoader workers
   --use_compile         Enable torch.compile
@@ -162,7 +162,7 @@ A CUDA-capable GPU is strongly recommended.
 
 To train PREpiBind from scratch or reproduce results, see:
 
-- **[`emb/`](emb/)** — Scripts to generate protein embeddings from multiple backends (ESMC, ESM3, AlphaFold3, Boltz, Chai-Lab)
+- **[`emb/`](emb/)** — Scripts to generate protein embeddings from multiple backends (ESM C, ESM3, AlphaFold 3, Boltz-1, Chai-1)
 - **[`train/`](train/)** — Training configs, scripts, and workflow documentation
 
 The general pipeline is: **generate embeddings** → **train model** → **evaluate**.

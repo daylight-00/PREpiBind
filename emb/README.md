@@ -10,9 +10,9 @@ This directory contains scripts to generate protein embeddings from multiple bac
 
 | Backend | Type | Single | Pair | Requires Modified Repo |
 |---------|------|:------:|:----:|:----------------------:|
-| [ESMC 300M](esm/) | PLM | O | X | |
+| [ESM C 300M](esm/) | PLM | O | X | |
 | [ESM3 Small](esm/) | PLM (API) | O | X | |
-| [AlphaFold3](af3/) | Structure | O | O | O |
+| [AlphaFold 3](af3/) | Structure | O | O | O |
 | [Boltz](boltz/) | Structure | O | O | O |
 | [Chai-Lab](chai/) | Structure | O | O | O |
 
@@ -39,13 +39,13 @@ Run `pair2side.ipynb` after generating pair embeddings to produce the `*_pair_si
 
 Generates per-residue embeddings using ESM protein language models. Two variants are provided:
 
-- **`esm_local_esmc_300m.py`** — Runs ESMC 300M locally on GPU. Single-threaded.
+- **`esm_local_esmc_300m.py`** — Runs ESM C 300M locally on GPU. Single-threaded.
 - **`esm_api_esm3_small_2408.py`** — Calls ESM3 Small via the [Forge API](https://forge.evolutionaryscale.ai). Multiprocessing with automatic retry.
 
 ```bash
 cd esm
 pip install esm
-python esm_local_esmc_300m.py   # Local ESMC 300M
+python esm_local_esmc_300m.py   # Local ESM C 300M
 python esm_api_esm3_small_2408.py  # ESM3 API (requires API token)
 ```
 
@@ -55,7 +55,7 @@ Both scripts read sequences from `../../data/mhc_mapping/HLA2_IMGT_light.csv` by
 
 ---
 
-### AlphaFold3 (`af3/`)
+### AlphaFold 3 (`af3/`)
 
 > **Requires cloning the modified repository:** `https://github.com/daylight-00/alphafold3`
 
