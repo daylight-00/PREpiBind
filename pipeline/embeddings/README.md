@@ -6,7 +6,7 @@ predictor. Producing those stores is a separate job, and each producer needs its
 
 | backend | environment | Python | why it cannot share the main environment |
 |---|---|---|---|
-| ESMC 300M, ESM3 | `esm/` | 3.13 | NumPy 1.26 vs the main environment's 2.2; needs `flash-attn` |
+| ESM C 300M, ESM3 | `esm/` | 3.13 | NumPy 1.26 vs the main environment's 2.2; needs `flash-attn` |
 | Chai-1 | `chai/` | 3.12 | own interpreter; needs `hhsuite` |
 | Boltz-1 | `boltz/` | 3.12 | own interpreter |
 | AlphaFold 3 | `af3/` | 3.11 | own interpreter; JAX 0.4.34 and CUDA 12.6 toolkit |
@@ -21,7 +21,7 @@ only to expose intermediate representations and bypass the diffusion modules.
 
 ## What is reproducible, and what is not
 
-Only the ESMC path is byte-reproducible, and only on an H100-class card with the pinned stack. The
+Only the ESM C path is byte-reproducible, and only on an H100-class card with the pinned stack. The
 recipe is exact and each element matters:
 
     with torch.device(device):
@@ -48,7 +48,7 @@ we did not test that across driver or card generations.
 
 ## Weights and databases are not included
 
-AlphaFold 3 parameters require a separate grant from Google DeepMind. Chai-1, Boltz-1 and ESMC
+AlphaFold 3 parameters require a separate grant from Google DeepMind. Chai-1, Boltz-1 and ESM C
 weights come from their own distribution channels. The MSA databases (BFD, UniRef90, UniProt,
 MGnify) are large public downloads.
 # Embedding Generation
@@ -63,7 +63,7 @@ This directory contains scripts to generate protein embeddings from multiple bac
 
 | Backend | Type | Single | Pair | Requires Modified Repo |
 |---------|------|:------:|:----:|:----------------------:|
-| [ESMC 300M](esm/) | PLM | O | X | |
+| [ESM C 300M](esm/) | PLM | O | X | |
 | [ESM3 Small](esm/) | PLM (API) | O | X | |
 | [AlphaFold3](af3/) | Structure | O | O | O |
 | [Boltz](boltz/) | Structure | O | O | O |
@@ -92,13 +92,13 @@ Run `pair2side.ipynb` after generating pair embeddings to produce the `*_pair_si
 
 Generates per-residue embeddings using ESM protein language models. Two variants are provided:
 
-- **`esm_local_esmc_300m.py`** — Runs ESMC 300M locally on GPU. Single-threaded.
+- **`esm_local_esmc_300m.py`** — Runs ESM C 300M locally on GPU. Single-threaded.
 - **`esm_api_esm3_small_2408.py`** — Calls ESM3 Small via the [Forge API](https://forge.evolutionaryscale.ai). Multiprocessing with automatic retry.
 
 ```bash
 cd esm
 pip install esm
-python esm_local_esmc_300m.py   # Local ESMC 300M
+python esm_local_esmc_300m.py   # Local ESM C 300M
 python esm_api_esm3_small_2408.py  # ESM3 API (requires API token)
 ```
 

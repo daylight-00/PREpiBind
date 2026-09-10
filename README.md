@@ -8,7 +8,7 @@
 
 PREpiBind predicts MHC class II–peptide binding from pre-trained protein language model (PLM)
 representations. It encodes epitope sequences on the fly with
-[ESMC 300M](https://huggingface.co/daylight-00/esmc-300m-2024-12) and reads pre-computed HLA
+[ESM C 300M](https://huggingface.co/daylight-00/esmc-300m-2024-12) and reads pre-computed HLA
 embeddings for the alpha and beta chains, feeding both into a lightweight cross-attention head.
 
 This repository is both the released model and the artifact for the paper: every dataset, figure
@@ -62,7 +62,7 @@ config_path       the config.py to run (positional)
 --use_compile     use torch.compile
 --plot            save the KDE plot of prediction scores
 --hla_emb_path    HLA embedding HDF5 store
---esm_chkp_path   ESMC backbone checkpoint
+--esm_chkp_path   ESM C backbone checkpoint
 ```
 
 Weights are fetched by the notebooks; to get them directly:
@@ -70,7 +70,7 @@ Weights are fetched by the notebooks; to get them directly:
 ```python
 from huggingface_hub import hf_hub_download
 
-# ESMC backbone, always required
+# ESM C backbone, always required
 hf_hub_download(repo_id="daylight-00/esmc-300m-2024-12", filename="esmc_300m_2024_12_v0_fp16.pth", local_dir="models")
 
 # PREpiBind checkpoint — download the one(s) you need. These are the float16 files the predict
@@ -159,8 +159,8 @@ the code:
 |----------------|-----------------------------------------|---------------------------------------|
 | HLA store      | full-length, float32                    | cut to the window, float16            |
 | mapping table  | carries the window as `sequence\|start\|end` | no window; the store is already cut |
-| precision      | `as-trained` — bfloat16 ESMC, float32 head | `fp16` — half throughout           |
-| epitopes       | read from a precomputed store            | encoded with ESMC at run time         |
+| precision      | `as-trained` — bfloat16 ESM C, float32 head | `fp16` — half throughout           |
+| epitopes       | read from a precomputed store            | encoded with ESM C at run time         |
 
 `encoder.get_plm_emb` slices only when the mapping asks it to, and raises if a window is applied to
 a store that was already cut. Because the demo encodes epitopes at run time it cannot reproduce the
@@ -173,7 +173,7 @@ are identical to five decimals at every batch size.
 
 Neither path needs a GPU, and `resolve_runtime` says out loud whatever it had to drop. On a
 pre-Ampere CUDA card such as Colab's T4 it turns flash-attn off and, for the `as-trained` path,
-runs ESMC in float16 instead of bfloat16; the `fp16` path is unchanged. Only when there is no CUDA
+runs ESM C in float16 instead of bfloat16; the `fp16` path is unchanged. Only when there is no CUDA
 device at all does everything fall back to float32.
 
 ## Output
@@ -193,7 +193,7 @@ configs/train/        one config per representation (11), plus config_global.jso
 configs/predict/      the four released models
 data/                 the four dataset arms, the HLA mapping tables, the epitope key list
 pipeline/preprocess/  IEDB export -> the four arms, as notebooks             (README)
-pipeline/embeddings/  one directory per backend: ESMC, ESM3, Chai-1, Boltz, AF3  (README)
+pipeline/embeddings/  one directory per backend: ESM C, ESM3, Chai-1, Boltz, AF3  (README)
 analysis/             scoring and figures; the raw-prediction manifest        (README)
 analysis/scoring/     raw predictions -> the *_results.csv the figures read
 analysis/figures/     the figures and tables in the paper

@@ -13,7 +13,7 @@ lives. It is a pointer, not a substitute for reading them.
 | HLA and H2 sequences, and the domain windows derived from them | `data/mhc_mapping/`, `pipeline/preprocess/mhc_sequences/` | IPD-IMGT/HLA and UniProt. Both are free to use with attribution; cite them as the database releases ask. |
 | Epitope–allele measurements | `data/dataset/` | Derived from the IEDB Export v3. IEDB is free to use and asks to be cited; the export itself is not redistributed here. |
 | ESM C encoder source, vendored from `esm` 3.4.0, modified as each file's header records | `prepibind/esmc/`, licence at `prepibind/esmc/LICENSE-esm.md` | **MIT** — the same terms as the rest of this repository, but a different copyright holder: "Copyright 2026 Chan Zuckerberg Biohub, Inc.". That is why the licence file travels with the directory. `rotary.py` additionally carries EleutherAI/HuggingFace's Apache-2.0 header, a separate grant that came with the file upstream. |
-| ESMC 300M HLA embeddings (demo set) | `demo/data/emb_hla_esmc_small_demo_fp16.h5` | Produced by running ESM C 300M. See ESM below. |
+| ESM C 300M HLA embeddings (demo set) | `demo/data/emb_hla_esmc_small_demo_fp16.h5` | Produced by running ESM C 300M. See ESM below. |
 
 ## Called, not redistributed
 
