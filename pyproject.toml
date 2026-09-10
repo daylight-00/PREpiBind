@@ -1,19 +1,93 @@
+# PREpiBind main environment: training, inference from precomputed embeddings, and all analysis.
+#
+# This is the environment every number in the paper came out of. It deliberately does NOT contain
+# `esm` or `flash-attn`: training and evaluation read embeddings from HDF5 stores and never run a
+# protein language model. Generating those stores is a separate job with its own interpreter and a
+# conflicting NumPy major version -- see pipeline/embeddings/.
+#
+# Pinning policy: pin what a reproducibility claim rests on, give everything else a floor.
+# `torch` is pinned because the released checkpoints and the reported scores were produced with it.
+# Only genuinely conda-only components appear under [tool.pixi.dependencies].
+
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["prepibind", "prepibind.esmc", "prepibind.utils"]
+
+# prepibind/esmc/ is redistributed third-party code, so its licence has to travel with it.
+[tool.setuptools.package-data]
+"prepibind.esmc" = ["LICENSE-esm.md"]
+
 [project]
 name = "prepibind"
 version = "1.0.0"
-description = "PREpiBind: MHC-II peptide binding prediction using protein language models"
-requires-python = ">=3.10"
+description = "PREpiBind: protein-representation-integrated epitope-MHC class II binding prediction"
+readme = "README.md"
+license = { file = "LICENSE" }
+# The paper environment is pinned to 3.13.2 below; the code itself needs nothing newer than
+# 3.11. torch >= 2.1 is the real floor for prepibind/esmc/ (nn.LayerNorm gained bias=False there).
+requires-python = ">=3.11"
 dependencies = [
-    "torch>=2.0",
+    "torch==2.6.0+cu126",
     "numpy",
     "pandas",
     "h5py",
+    "scikit-learn",
+    "scipy",
     "matplotlib",
     "seaborn",
     "tqdm",
-    "esm",
-    "huggingface_hub",
+    # `make figures`, `make scoring` and `make datasets` all execute notebooks.
+    "nbclient",
+    "nbconvert",
+    "nbformat",
+    "ipykernel",
+    # unpacks analysis/figures/data/figure_inputs.tar.zst
+    "zstandard",
+    # Supplementary Figure S1, which `make figures` builds
+    "upsetplot",
+    "svgutils",
 ]
 
-[tool.uv]
-dev-dependencies = []
+[project.optional-dependencies]
+# The demo predicts from sequence, so it encodes epitopes with ESMC at run time and pulls the
+# weights from HuggingFace. Nothing in the paper needs either: training and evaluation read
+# embeddings that were generated separately (pipeline/embeddings/).
+#
+# The ESMC encoder is vendored in prepibind/esmc/ and runs on torch alone, so this extra adds only
+# the HuggingFace download client and installs into the environment above. It used to pin
+# esm==3.1.6, which forced numpy<2 (via biotite 0.41.2), pulled torchvision/torchtext and had no
+# 3.13 wheel; pipeline/embeddings/ still needs that pin and keeps it in its own interpreter.
+demo = ["huggingface_hub"]
+
+[project.urls]
+Repository = "https://github.com/daylight-00/PREpiBind"
+
+# Install the package itself, so `from prepibind import model` resolves to the installed copy
+# rather than to whatever happens to be in the working directory.
+[tool.pixi.pypi-dependencies]
+prepibind = { path = ".", editable = true }
+
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+platforms = ["linux-64"]
+
+[tool.pixi.pypi-options]
+extra-index-urls = ["https://download.pytorch.org/whl/cu126"]
+
+[tool.pixi.dependencies]
+python = "==3.13.2"
+
+# RAPIDS is conda-only. Needed just to recompute Supplementary Figure S2; the committed
+# analysis/figures/umap_cache/*.npz reproduce the panel without it.
+[tool.pixi.feature.umap]
+channels = [{ channel = "rapidsai", priority = 1 }, "conda-forge"]
+[tool.pixi.feature.umap.dependencies]
+rapids = "==25.06.00"
+umap-learn = "==0.5.8"
+
+[tool.pixi.environments]
+default = { solve-group = "main" }
+umap = { features = ["umap"], solve-group = "main" }

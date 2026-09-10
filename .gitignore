@@ -1,10 +1,21 @@
+# pixi environments: the lock files are tracked, the built environments are not
+.pixi/
+pipeline/embeddings/*/.pixi/
+
+# preprocessing: the IEDB export and the intermediates it produces
+pipeline/preprocess/input/
+pipeline/preprocess/work/
+
+# figure bundle, unpacked on demand by rawpath.at()
+analysis/figures/data/extracted/
+
+# run outputs and weights
 plots
 outputs
 models
 *.pth
-emb/*h5
-emb_hla_esmc_small_0601_fp16.h5
-emb_hla_esmc_small_0601_bp16.h5
+*.h5
+!demo/data/*.h5
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
