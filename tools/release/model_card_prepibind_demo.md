@@ -70,9 +70,9 @@ comparison, mean over 15 runs against this run alone, is on the
 
 Two separate reasons, and both of them are accepted rather than fixed:
 
-1. **Half precision throughout.** The head runs in float16 and so does ESM C, against float32 head
-   and bfloat16 ESM C on the research path.
-2. **The demo encodes epitopes with ESM C at run time** instead of reading the precomputed store the
+1. **Half precision throughout.** The head runs in float16 and so does ESMC, against float32 head
+   and bfloat16 ESMC on the research path.
+2. **The demo encodes epitopes with ESMC at run time** instead of reading the precomputed store the
    training and the paper's evaluation used. That alone makes bit-exactness impossible whatever
    precision it runs in. On Colab's free tier the GPU is a **T4, which is pre-Ampere, so flash-attn
    is off** and the runtime says so when it drops it.
@@ -142,7 +142,7 @@ cfg = load_config("configs/predict/config_demo.py", test_path="my_input.csv", ou
 df = main(cfg)
 ```
 
-The ESM C encoder is vendored into `prepibind/esmc/`, so the demo needs only `torch` and
+The ESMC encoder is vendored into `prepibind/esmc/`, so the demo needs only `torch` and
 `huggingface_hub`, both already present on Colab. Do not `pip install esm`.
 
 No GPU is required. Without CUDA the runtime falls back to float32 throughout and turns off
@@ -158,7 +158,7 @@ store, binding rather than immunogenicity — plus the precision deviation measu
 
 ## Licence
 
-**MIT** for these weights, same as the repository. The ESM C 300M backbone is not ours but is also
+**MIT** for these weights, same as the repository. The ESMC 300M backbone is not ours but is also
 MIT: it moved to [`biohub/esmc-300m-2024-12`](https://huggingface.co/biohub/esmc-300m-2024-12)
 (ungated, tagged `mit` + `other`), and the vendored encoder source is copied from `esm` 3.4.0, whose
 licence is plain MIT, "Copyright 2026 Chan Zuckerberg Biohub, Inc.". Checked 2026-09-10; see

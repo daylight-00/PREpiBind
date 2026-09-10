@@ -13,7 +13,7 @@ size_categories:
 
 # PREpiBind HLA embeddings — `emb_hla_esmc_small_0430.h5`
 
-The full-length, float32 ESM C 300M embeddings of the MHC class II chains PREpiBind was trained and
+The full-length, float32 ESMC 300M embeddings of the MHC class II chains PREpiBind was trained and
 evaluated on. One HDF5 file, 142.9 MiB, 154 datasets.
 
 This is the store the research path reads. It is not the demo's store: the demo ships a smaller
@@ -55,7 +55,7 @@ curation and are used by analyses of molecule coverage, not by any released chec
 
 ## How it was produced
 
-ESM C 300M forward pass over each chain's full amino-acid sequence, per-residue hidden states
+ESMC 300M forward pass over each chain's full amino-acid sequence, per-residue hidden states
 kept, `[CLS]` and `[EOS]` stripped, written as float32. The code is `pipeline/embeddings/esmc/` in
 the repository; the sequences come from `data/mhc_mapping/`, which derives from IPD-IMGT/HLA and
 UniProt. Nothing here is a measurement — it is a deterministic function of the sequences and the
@@ -149,7 +149,7 @@ path predates a repository move and no longer exists, so set the variable.
 
 ## Licence
 
-**MIT.** These arrays are outputs of ESM C 300M. That model moved to Chan Zuckerberg Biohub —
+**MIT.** These arrays are outputs of ESMC 300M. That model moved to Chan Zuckerberg Biohub —
 [`biohub/esmc-300m-2024-12`](https://huggingface.co/biohub/esmc-300m-2024-12), ungated, card tagged
 `mit` + `other` — so the Cambrian Open License Agreement this card previously cited no longer
 governs it, and the same MIT grant that covers the PREpiBind code and weights applies here. Checked
@@ -169,4 +169,4 @@ cite them as those databases ask.
 }
 ```
 
-Cite ESM C as EvolutionaryScale asks, as well: these embeddings are its output.
+Cite ESMC as EvolutionaryScale asks, as well: these embeddings are its output.

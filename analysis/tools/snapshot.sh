@@ -12,7 +12,7 @@
 set -euo pipefail
 
 PP="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-RAW="$PP/0_raw"
+RAW="${PREPIBIND_RAW_ROOT:-$PP/0_raw}"
 MANIFEST="$PP/raw_manifest.csv"
 ZSTD_OPTS=${ZSTD_OPTS:--12 -T0}
 

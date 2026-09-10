@@ -1,4 +1,4 @@
-"""ESM C 300M encoder, vendored so that predicting from sequence needs only torch.
+"""ESMC 300M encoder, vendored so that predicting from sequence needs only torch.
 
 Copied from `esm` 3.4.0 (Chan Zuckerberg Biohub, Inc.) and stripped to the sequence-only,
 no-geometric-attention path that PREpiBind actually runs:

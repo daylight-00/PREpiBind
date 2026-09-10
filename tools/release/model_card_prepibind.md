@@ -125,7 +125,7 @@ The qualitative arm's training config names `dataset/full_bal/`, a directory sin
 Training: AdamW, lr 1e-5, betas (0.9, 0.999), eps 1e-8, weight decay 0.01, five-fold CV, best epoch
 by validation loss (20, 27, 28, 28 for the four files above — the epoch each file stores, and the
 corrected argmin of its run). Both sides were fed from precomputed
-ESM C 300M embeddings, `emb_hla_esmc_small_0430.h5` for the HLA chains and the matching epitope
+ESMC 300M embeddings, `emb_hla_esmc_small_0430.h5` for the HLA chains and the matching epitope
 store.
 
 ## Architecture
@@ -137,8 +137,8 @@ store.
 - 1 joint self-attention block over the two concatenated token sequences
 - masked mean pool, then `Linear(960, 480) -> GELU -> Dropout -> Linear(480, 1)`, one logit
 
-Inputs are per-residue ESM C 300M embeddings, 960-dimensional. The head is not a language model and
-never sees a raw sequence: the epitope is encoded at run time by ESM C 300M, the HLA alpha and beta
+Inputs are per-residue ESMC 300M embeddings, 960-dimensional. The head is not a language model and
+never sees a raw sequence: the epitope is encoded at run time by ESMC 300M, the HLA alpha and beta
 chains are read from a precomputed store.
 
 ## Input format
@@ -178,7 +178,7 @@ hf download daylight-00/esmc-300m-2024-12   esmc_300m_2024_12_v0_fp16.pth    --l
 hf download daylight-00/prepibind-embeddings emb_hla_esmc_small_0430.h5 --repo-type dataset --local-dir emb
 ```
 
-The ESM C encoder is vendored into the package (`prepibind/esmc/`), so `torch` and
+The ESMC encoder is vendored into the package (`prepibind/esmc/`), so `torch` and
 `huggingface_hub` are the only runtime dependencies for inference — no `pip install esm`.
 
 ```python
@@ -192,7 +192,7 @@ cfg = load_config(
     test_path="my_input.csv",
     out_path="outputs",
 )
-cfg["Test"]["precision"] = "as-trained"   # bfloat16 ESM C, float32 head. The default in that
+cfg["Test"]["precision"] = "as-trained"   # bfloat16 ESMC, float32 head. The default in that
                                           # config is "fp16", which is the demo's setting.
 df = main(cfg)                            # writes outputs/prediction.csv, returns the DataFrame
 ```
@@ -233,11 +233,11 @@ back to float32 and says so.
 
 **MIT** for these weights and for the PREpiBind code, same as the repository.
 
-The backbone is not ours, but it is also MIT. ESM C 300M moved to Chan Zuckerberg Biohub:
+The backbone is not ours, but it is also MIT. ESMC 300M moved to Chan Zuckerberg Biohub:
 [`biohub/esmc-300m-2024-12`](https://huggingface.co/biohub/esmc-300m-2024-12) is ungated and its card
 is tagged `mit` + `other`, and `esm` 3.4.0 — the release the vendored `prepibind/esmc/` source is
 copied from — ships a plain MIT licence, "Copyright 2026 Chan Zuckerberg Biohub, Inc.". These
-checkpoints were produced by training on ESM C 300M embeddings. Checked 2026-09-10; the repository's
+checkpoints were produced by training on ESMC 300M embeddings. Checked 2026-09-10; the repository's
 `THIRD_PARTY_NOTICES.md` records the evidence and every other dependency.
 
 Training data derives from the IEDB Export v3 (free to use, asks to be cited) and allele sequences

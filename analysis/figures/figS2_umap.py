@@ -186,7 +186,7 @@ os.makedirs(CACHE_DIR, exist_ok=True)
 fig, axes = plt.subplots(2, 2, figsize=(8, 8))
 
 methods = ['blosum', 'chai', 'esmc', 'esm3']
-titles = ['BLOSUM62', 'Chai-1', 'ESM C 300M', 'ESM3 Small']
+titles = ['BLOSUM62', 'Chai-1', 'ESMC 300M', 'ESM3 Small']
 
 for idx, (method, title) in enumerate(zip(methods, titles)):
     row = idx // 2

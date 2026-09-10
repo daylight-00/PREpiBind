@@ -212,7 +212,7 @@ hf upload daylight-00/prepibind-embeddings \
 |---|---|---:|---:|
 | `emb_hla_esmc_small_0430.h5` | `/home/hwjang/project/EMB/emb_hla_esmc_small_0430.h5` | 149,865,560 | 142.9 |
 
-154 datasets, float32, `(L, 960)`, 21 distinct `L` from 81 to 266. These are ESM C outputs, and ESM C
+154 datasets, float32, `(L, 960)`, 21 distinct `L` from 81 to 266. These are ESMC outputs, and ESMC
 300M is now MIT under Chan Zuckerberg Biohub (`biohub/esmc-300m-2024-12`, checked 2026-09-10), so the
 card carries `license: mit`.
 
