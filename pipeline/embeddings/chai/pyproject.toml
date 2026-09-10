@@ -1,0 +1,20 @@
+# Chai-1 embedding backend. The fork exposes single and pair representations and bypasses diffusion.
+# The commit is pinned because it fixes the algorithm. No numerical claim is made: Chai-1's trunk is
+# nondeterministic at ~3% relative on identical sequence and MSA input.
+[project]
+name = "prepibind-emb-chai"
+version = "1.0.0"
+requires-python = "==3.12.*"
+dependencies = [
+    "chai-lab @ git+https://github.com/daylight-00/chai-lab.git@7f4510f54819145a55179f93bf82ad299b1dd6c3",
+    "h5py",
+    "pandas",
+]
+
+[tool.pixi.workspace]
+channels = ["bioconda", "conda-forge"]
+platforms = ["linux-64"]
+
+[tool.pixi.dependencies]
+python = "==3.12.9"
+hhsuite = "==3.3.0"   # MSA search; not on PyPI

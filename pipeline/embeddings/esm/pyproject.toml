@@ -1,0 +1,39 @@
+# ESMC 300M / ESM3 embedding generation, and the on-the-fly demo path in code/inference.py.
+#
+# Separate from the main environment for two reasons, not one:
+#   * NumPy major version. This stack runs NumPy 1.26; the main environment runs 2.2.
+#   * flash-attn. Hard-required here (esm's attention kernel), a heavy build, and irrelevant to
+#     training or analysis.
+#
+# Everything here is pinned. Embeddings are byte-reproducible only on this exact combination and
+# only on an H100-class card. Measured: the same recipe on an RTX 4070 Ti differs by 3.7% relative,
+# and esm 3.4.0 with everything else held fixed differs by 3.3%. Both are large enough to change
+# predictions. Do not float these.
+[project]
+name = "prepibind-emb-esm"
+version = "1.0.0"
+requires-python = "==3.13.*"
+dependencies = [
+    "torch==2.6.0+cu126",
+    "esm==3.1.6",
+    "flash-attn==2.7.4.post1",
+    "numpy<2",
+    "h5py",
+    "pandas",
+    "tqdm",
+]
+
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+platforms = ["linux-64"]
+
+[tool.pixi.pypi-options]
+extra-index-urls = ["https://download.pytorch.org/whl/cu126"]
+no-build-isolation = ["flash-attn"]   # compiles against the installed torch
+
+[tool.pixi.dependencies]
+python = "==3.13.2"
+# flash-attn is an sdist and compiles CUDA kernels at install time, so the install needs nvcc and
+# CUDA_HOME. nvcc ships here; point CUDA_HOME at the environment prefix, or at a system toolkit.
+# Compiling needs no GPU.
+cuda-nvcc = "12.6.*"

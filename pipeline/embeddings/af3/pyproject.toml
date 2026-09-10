@@ -1,0 +1,56 @@
+# AlphaFold 3 embedding backend. The fork exposes single and pair representations and bypasses
+# diffusion; the export itself lives in the pinned commit (src/alphafold3/model/model_custom.py and
+# run_alphafold_custom.py), so the commit is the whole modification.
+#
+# This one cannot be a pure lockfile, and that is a property of AlphaFold 3 rather than a choice:
+#
+#   * alphafold3 3.0.1 is a scikit-build-core/CMake source build, not a pip package. Configuring it
+#     git-clones abseil-cpp, pybind11, pybind11_abseil, libcifpp and dssp. All five are pinned to
+#     commit SHAs upstream, so the build is reproducible, but it needs a C++ toolchain, CMake >= 3.28
+#     and network access at install time.
+#   * HMMER is an external binary the upstream Dockerfile builds from source. Here it comes from
+#     bioconda instead.
+#   * `build_data` must run once after the install to prepare the chemical component data.
+#
+# A prebuilt wheel of the pinned commit is recorded in provenance/ for anyone who would rather not
+# run the CMake build; it is tied to one Python version, CUDA version and CPU architecture, so it is
+# a convenience, not the specification.
+#
+# Model parameters are NOT included and require a separate grant from Google DeepMind.
+[project]
+name = "prepibind-emb-af3"
+version = "1.0.0"
+requires-python = "==3.11.*"
+dependencies = [
+    "alphafold3 @ git+https://github.com/daylight-00/alphafold3.git@f1b872e7375d82b322cde5f2ac5efa2cda33f1f4",
+    "jax==0.4.34",
+    "jaxlib==0.4.34",
+    "jax-cuda12-plugin==0.4.34",
+    "jax-cuda12-pjrt==0.4.34",
+    "jaxtyping==0.2.34",
+    "dm-haiku==0.0.13",
+    "chex==0.1.87",
+    "rdkit==2024.3.5",
+    "h5py",
+    "pandas",
+]
+
+[tool.pixi.workspace]
+channels = [
+    "conda-forge",
+    { channel = "bioconda", priority = -1 },
+    { channel = "nvidia/label/cuda-12.6.0", priority = -2 },
+]
+platforms = ["linux-64"]
+
+[tool.pixi.dependencies]
+python = "==3.11.11"
+cuda-toolkit = "==12.6.0"   # nvcc for the CMake build
+hhsuite = "==3.3.0"         # MSA search
+hmmer = "==3.4"             # jackhmmer, nhmmer, hmmalign, hmmsearch, hmmbuild
+cmake = ">=3.28"
+ninja = "*"
+zlib = "==1.3.1"
+
+[tool.pixi.tasks]
+prepare = "build_data"      # run once after install

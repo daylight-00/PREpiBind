@@ -1,0 +1,53 @@
+{
+    "chkp_path": "models",
+    "log_file": "train.log",
+    "plot_path": "plots",
+    "seed": 100,
+    "CrossValidation": {
+        "cv": true,
+        "num_folds": 5,
+        "val_fold": 4
+    },
+    "Data": {
+        "epi_path": "data/dataset/full/train.csv",
+        "epi_args": {
+            "epi_header": "Epi_Seq",
+            "hla_header": "HLA_Name",
+            "tgt_header": "Target",
+            "seperator": ","
+        },
+        "hla_path": "data/mhc_mapping/HLA2_IMGT_MSA_idx_edit.csv",
+        "hla_args": {
+            "hla_header": "HLA_Name",
+            "seq_header": "HLA_Seq",
+            "seperator": ","
+        },
+        "test_path": "data/dataset/full/test.csv",
+        "test_args": {
+            "epi_header": "Epi_Seq",
+            "hla_header": "HLA_Name",
+            "tgt_header": "Target",
+            "seperator": ","
+        },
+        "num_workers": 8,
+        "val_size": 0.2
+    },
+    "Train": {
+        "batch_size": 128,
+        "num_epochs": 500,
+        "patience": 10,
+        "optimizer_args": {
+            "lr": 0.0001
+        },
+        "use_scheduler": false
+    },
+    "Test": {
+        "batch_size": 256,
+        "chkp_prefix": "best",
+        "plot": true,
+        "feat_extract": false,
+        "feat_path": "feat_extract",
+        "target_layer": "output_layer",
+        "save_pred": true
+    }
+}
