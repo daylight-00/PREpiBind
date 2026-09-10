@@ -7,8 +7,9 @@ in some copies and not others. The logic now lives here once; each analysis supp
 only its own configuration.
 
 Reads exclusively through `rawpath`, so it runs on clusters that have no scratch
-data. Provenance stays available via rp.source() / rp.find() and the src_root /
-src_path columns that collect() carries through.
+data. Provenance of a written row is its `rel`: `raw_manifest.csv` keys md5, size,
+source cluster and scratch path on it, and rp.source(rel) / rp.find() go both ways.
+No table written from here carries an absolute path -- see portable_paths().
 
 Aggregation
 -----------
@@ -147,7 +148,12 @@ def collect(roots, dir_filter='plots*', test_for=None) -> pd.DataFrame:
         group                <dir> minus that prefix, i.e. the held-out molecule
                              for LOMO-style layouts, else ''
         root                 scratch root this file came from
-        rel path src_path    snapshot rel, openable path, original scratch path
+        rel                  snapshot-relative key, and the join key into
+                             raw_manifest.csv
+        path src_path        openable path, original scratch path. Both are
+        file_path            machine-specific, so portable_paths() strips or drops
+                             them before anything is written; only `rel` and the
+                             relativised `path` / `test_path` are published.
         test_path            filled in by the test_for callable, if given
 
     `dir_filter` is a glob, or a sequence of globs, on the `dir` component. It
@@ -329,7 +335,9 @@ def add_metrics(df: pd.DataFrame, target_for=None, subsets=None,
         print('warning:', msg)
     res = pd.DataFrame(rows)
     if out:
-        res.to_csv(out, index=False)
+        # the frame keeps its absolute paths for the rest of the run; the file does
+        # not get them, exactly as in run()
+        portable_paths(res).to_csv(out, index=False)
     return res
 
 
@@ -733,24 +741,57 @@ def stars(p) -> str:
 
 
 # ------------------------------------------------------------------ driver
-def portable_paths(df: pd.DataFrame) -> pd.DataFrame:
-    """Strip the two roots from the path columns before a table is written.
+#: path columns kept in a written table, relative to the root they were resolved
+#: against: `path` to the snapshot (rp.at / PREPIBIND_RAW_ROOT), `test_path` to the
+#: repository's own data/ (rp.data). 9_boot/boot.py reads both back and re-resolves
+#: them, which is the whole reason they survive.
+REL_PATH_COLS = ('path', 'test_path')
+#: path columns dropped instead. `src_path` is the absolute scratch location of the
+#: prediction file and `file_path` is a duplicate of `path`; nothing in the tree
+#: reads either one back (build_manifest.read_ledger() takes `rel`, and only falls
+#: back to these for pre-pipeline CSVs that have no `rel`). Kept in the frame while
+#: an analysis runs, dropped on the way out.
+DROP_PATH_COLS = ('src_path', 'file_path')
 
-    `path`, `file_path` and `test_path` are absolute while the analysis runs, and they resolve
-    against wherever this checkout and the snapshot happen to sit. Written out as-is they differ
-    on every machine, so a rerun looks like it changed the results when it did not. `src_path`
-    keeps the original scratch location, which is provenance and does not depend on the reader.
+
+def portable_paths(df: pd.DataFrame) -> pd.DataFrame:
+    """Make a frame safe to write out: no column may carry an absolute path.
+
+    The path columns are absolute while the analysis runs, and they resolve against
+    wherever this checkout, the snapshot and the scratch tree happen to sit. Written
+    out as-is they differ on every machine, so a rerun looks like it changed the
+    results when it did not - and, since these tables are published, they also state
+    a home directory on the cluster that produced them. So:
+
+    * REL_PATH_COLS are made relative to the root they were resolved against, which
+      is what rp.at() / rp.data() turn back into an openable path on any machine.
+    * DROP_PATH_COLS go away. Provenance does not go with them: `rel` is the key
+      into raw_manifest.csv, which carries the md5, the size, the source cluster and
+      the scratch path of every file, and rp.source(rel) reconstructs the original
+      location directly.
+
+    A path that survives all of that is an error rather than something to publish:
+    it means a config resolved a file outside every known root.
     """
     out = df.copy()
-    roots = [r for r in (rp.RAW_ROOT, rp.DATA_ROOT, rp._REPO) if r]
-    for col in ('path', 'file_path', 'test_path'):
+    # the scratch root last: it is unset off-cluster, and RAW_ROOT / DATA_ROOT sit
+    # under the checkout, so the more specific roots have to be stripped first
+    roots = [r for r in (rp.RAW_ROOT, rp.DATA_ROOT, rp._REPO, rp.SCRATCH) if r]
+    for col in REL_PATH_COLS:
         if col not in out.columns:
             continue
         v = out[col].astype('string')
         for root in roots:
             v = v.str.replace(root.rstrip(os.sep) + os.sep, '', regex=False)
+        left = v.str.startswith(os.sep).fillna(False)
+        if left.any():
+            raise ValueError(
+                f'{col} is still absolute for {int(left.sum())} rows, e.g. '
+                f'{v[left].iloc[0]!r}. It resolves under none of {roots}, so writing '
+                f'it would publish a path that only exists on this machine. Reach the '
+                f'file through rp.at() / rp.data() so it lands under one of them.')
         out[col] = v
-    return out
+    return out.drop(columns=[c for c in DROP_PATH_COLS if c in out.columns])
 
 
 def run(cfg: dict, write: bool = True):
