@@ -1,0 +1,199 @@
+# What this repository can actually check on a runner with no GPU, no cluster and no private data.
+#
+#   names     text-only: the four predict configs, the README and both notebooks must name the
+#             same four checkpoints. Needs nothing installed, so it is the fast gate.
+#   package   installs with the command README gives users, then imports every module and runs
+#             each `python -m` entry point from outside the checkout. This is the job that would
+#             have caught `from plot import ...` surviving the code/ -> prepibind/ move.
+#   parity    installs `esm` and proves the vendored ESM C in prepibind/esmc/ still matches it.
+#             The other jobs run check_parity too, but there it *skips* (no esm), so it proves
+#             only that the skip works. This one asserts the comparison really ran.
+#
+# Nothing here needs the prediction snapshot, the embedding stores or the IEDB export, so `make
+# figures`, `make scoring`, `make datasets` and `make verify` are all out of scope: they cannot
+# run on a runner and a test that cannot run is not a test.
+
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  names:
+    name: release names agree
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      # Standard library only -- no install step above on purpose.
+      - name: Every source names the same four checkpoints
+        run: python .github/scripts/check_release_names.py
+
+      - name: Everything shipped is at least syntactically valid
+        run: python -m compileall -q prepibind configs demo pipeline analysis tools supplementary_data
+
+  package:
+    name: import the package (py${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 3.11 is the floor pyproject claims; 3.13.2 is what pixi.lock pins. Both, nothing between.
+        python: ["3.11", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+
+      # Verbatim from README's Quick Start, extra index and all. It is a large install -- torch
+      # 2.6.0+cu126 drags in the CUDA runtime wheels -- but running the documented line is the
+      # point: it is what breaks when the pin, the index or the package list goes stale.
+      - name: pip install -e ".[demo]"
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --extra-index-url https://download.pytorch.org/whl/cu126 -e ".[demo]"
+
+      # Imports every module the package ships, from a directory that is not the checkout, so a
+      # bare sibling import (`from plot import ...`) or a path assumption fails here.
+      - name: Import every module
+        run: |
+          cd "$RUNNER_TEMP"
+          python - <<'PY'
+          import importlib, pkgutil, sys
+          import prepibind
+          mods = ["prepibind"] + sorted(
+              m.name for m in pkgutil.walk_packages(prepibind.__path__, "prepibind."))
+          # prepibind.utils has no __init__.py, so walk_packages does not descend into it.
+          mods += ["prepibind.utils.matrix", "prepibind.utils.scheduler", "prepibind.utils.loss_plot"]
+          bad = []
+          for m in mods:
+              try:
+                  importlib.import_module(m)
+                  print("ok  ", m)
+              except Exception as e:
+                  print("FAIL", m, type(e).__name__, e)
+                  bad.append(m)
+          print(f"{len(mods) - len(bad)}/{len(mods)} imported")
+          sys.exit(1 if bad else 0)
+          PY
+
+      # The three entry points prepibind/__init__.py advertises and configs/train/run.sh calls.
+      - name: Entry points run as modules
+        run: |
+          cd "$RUNNER_TEMP"
+          python -m prepibind.train --help > /dev/null
+          python -m prepibind.test --help > /dev/null
+          python -m prepibind.inference --help > /dev/null
+
+      # PREPIBIND_EMB_ROOT deliberately has no default: the HDF5 stores are in no fresh clone, so
+      # an unset variable must be an error that names it, never a guessed path. `make verify` used
+      # to end in FileNotFoundError under a default of <repo>/emb/stores, a directory that has not
+      # existed since emb/ became pipeline/embeddings/. Lock the replacement in.
+      - name: No store path is ever guessed
+        run: |
+          # Unset, not set-to-empty: `os.environ.get(VAR, "some/default")` still returns the
+          # default when the name is absent, and an empty value would hide exactly that.
+          unset PREPIBIND_EMB_ROOT
+          set +e
+          out=$(python demo/build_demo_assets.py hla-store --check 2>&1); rc=$?
+          set -e
+          echo "$out"
+          if [ "$rc" -eq 0 ]; then
+            echo "build_demo_assets exited 0 with no PREPIBIND_EMB_ROOT set"; exit 1
+          fi
+          if ! grep -q PREPIBIND_EMB_ROOT <<<"$out"; then
+            echo "the error text does not name the variable"; exit 1
+          fi
+          python - <<'PY'
+          import glob, importlib.util, os, sys
+          bad = []
+          for f in sorted(glob.glob("configs/train/*.py")):
+              spec = importlib.util.spec_from_file_location("c", f)
+              mod = importlib.util.module_from_spec(spec)
+              try:
+                  spec.loader.exec_module(mod)
+              except SystemExit as e:
+                  # It asked for the store root. The message has to name the variable.
+                  if "PREPIBIND_EMB_ROOT" in str(e):
+                      print(f"{os.path.basename(f):24s} requires PREPIBIND_EMB_ROOT")
+                  else:
+                      bad.append(f"{f}: exits without naming PREPIBIND_EMB_ROOT: {e}")
+                  continue
+              # Loading anyway is only allowed for an arm that reads no store at all: BLOSUM62 and
+              # DeepNeo encode from a matrix. A guessed store path would show up right here.
+              stores = [v for v in mod.config["encoder_args"].values()
+                        if isinstance(v, str) and v.endswith(".h5")]
+              if stores:
+                  bad.append(f"{f}: loaded with PREPIBIND_EMB_ROOT unset and still names {stores}")
+              else:
+                  print(f"{os.path.basename(f):24s} reads no store")
+          if bad:
+              print("\n".join(bad), file=sys.stderr)
+              sys.exit(1)
+          PY
+
+      # No esm here, so this exercises the skip path -- the one the released environment takes.
+      - name: check_parity skips where esm is absent
+        run: |
+          out=$(python -m prepibind.esmc.check_parity)
+          echo "$out"
+          if ! grep -q "esm is not installed" <<<"$out"; then
+            echo "expected the skip path, got the above"; exit 1
+          fi
+
+  parity:
+    name: vendored ESM C == esm
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          # esm 3.1.6 pins biotite==0.41.2 and torchtext, neither of which has a cp313 wheel.
+          # 3.1.6 is a valid control for code vendored from 3.4.0: 3.4.0 still ships the legacy
+          # esm/models/esmc.py and esm/layers/*, which differ from 3.1.6's only by type
+          # annotations and by the `output_attentions` branch this package strips. 3.4.0 itself is
+          # not used here because it requires torch >= 2.11 and CUDA op wheels.
+          python-version: "3.11"
+          cache: pip
+
+      # --no-deps: esm brings its own torch, and letting it resolve against the cu126 pin in
+      # pyproject.toml would fight over the same package for no gain. The parity check needs the
+      # vendored source importable, not the pinned environment.
+      - name: Install esm and the package
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --no-deps -e .
+          python -m pip install "esm==3.1.6" huggingface_hub
+
+      # 666 MB, public and ungated. check_parity defaults to exactly this path.
+      - name: Fetch the ESM C 300M weights
+        run: |
+          python - <<'PY'
+          from huggingface_hub import hf_hub_download
+          p = hf_hub_download("daylight-00/esmc-300m-2024-12",
+                              "esmc_300m_2024_12_v0_fp16.pth", local_dir="models")
+          print(p)
+          PY
+
+      # Must NOT skip. Both assertions matter: a green run that quietly skipped would be the whole
+      # failure mode this job exists to rule out.
+      - name: Compare the vendored stack against esm
+        run: |
+          out=$(python -m prepibind.esmc.check_parity)
+          echo "$out"
+          if grep -q "skipping" <<<"$out"; then
+            echo "check_parity skipped: esm did not install, so nothing was compared"; exit 1
+          fi
+          if ! grep -q "vendored ESMC matches esm" <<<"$out"; then
+            echo "check_parity did not reach its conclusion"; exit 1
+          fi

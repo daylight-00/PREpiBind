@@ -1,0 +1,14 @@
+model_key,learning_rate,method,parameters,representation_family
+blosum,e3,BLOSUM62,39450.0,Baseline
+af3,e5,AlphaFold 3,24823041.0,AF3-like
+boltz,e5,Boltz-1,24823041.0,AF3-like
+chai,e5,Chai-1,48629505.0,AF3-like
+esmc_small,e5,ESMC 300M,55820161.0,ESMC
+esmc_medium,e5,ESMC 600M,80365825.0,ESMC
+esmc_large,e5,ESMC 6B,396661761.0,ESMC
+esm3_small,e5,ESM3 Small,142838785.0,ESM3
+esm3_medium,e5,ESM3 Medium,396661761.0,ESM3
+esm3_large,e5,ESM3 Large,2284204033.0,ESM3
+deepneo,e3,DeepNeo,,
+netmhcpan,,NetMHCIIpan-4.3,,Published
+mixmhcpred,,MixMHC2pred-2.0,,Published

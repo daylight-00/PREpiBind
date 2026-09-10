@@ -1,0 +1,14 @@
+model,lr,full_name,params,fam,plot
+esm3_large,e5,ESM3 Large,2284204033,ESM3,True
+esm3_medium,e5,ESM3 Medium,396661761,ESM3,
+esmc_medium,e5,ESMC 600M,80365825,ESMC,
+esm3_small,e5,ESM3 Small,142838785,ESM3,True
+esmc_small,e5,ESMC 300M,55820161,ESMC,True
+chai,e5,Chai-1,48629505,AF3-like,True
+esmc_large,e5,ESMC 6B,396661761,ESMC,
+boltz,e5,Boltz-1,24823041,AF3-like,
+af3,e5,AlphaFold 3,24823041,AF3-like,
+blosum,e3,BLOSUM62,39450,Baseline,True
+deepneo,e3,DeepNeo,,,True
+netmhcpan,,NetMHCIIpan-4.3,,Published,True
+mixmhcpred,,MixMHC2pred-2.0,,Published,True
