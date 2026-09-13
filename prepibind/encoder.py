@@ -5,20 +5,20 @@ import h5py
 import time
 
 #%% PLM
-def get_plm_emb(emb_dict, key, start_idx_a=None, end_idx_a=None, max_retries=5, retry_delay=0.1):
+def get_plm_emb(emb_dict, key, start_idx=None, end_idx=None, max_retries=5, retry_delay=0.1):
     for attempt in range(max_retries):
         try:
             embedding = np.squeeze(emb_dict[key][()])
             embedding = torch.tensor(embedding, dtype=torch.float32)
-            if start_idx_a is not None and end_idx_a is not None:
+            if start_idx is not None and end_idx is not None:
                 # A store that was already cut to the window is shorter than the window's own end,
                 # and slicing it again would silently return the wrong residues.
-                if end_idx_a > len(embedding):
+                if end_idx > len(embedding):
                     raise ValueError(
-                        f'{key}: the window is {start_idx_a}:{end_idx_a} but the stored embedding is '
+                        f'{key}: the window is {start_idx}:{end_idx} but the stored embedding is '
                         f'{len(embedding)} long. This store is already cut to the window; use a '
                         f'mapping table without one, or point at the full-length store.')
-                embedding = embedding[start_idx_a:end_idx_a]
+                embedding = embedding[start_idx:end_idx]
             return embedding
         except OSError as e:
             print(f"[get_plm_emb] OSError occured (Attemp {attempt + 1}/{max_retries}) — key: {key}")

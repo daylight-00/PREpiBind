@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader
 import torch
 from tqdm import tqdm
 
-def test_model(model, dataloader, device):
+def predict(model, dataloader, device):
     model.eval()
     all_preds = []
     with torch.no_grad():
@@ -17,13 +17,13 @@ def test_model(model, dataloader, device):
             all_preds.append(y_pred)
     return np.concatenate(all_preds)
 
-def tmp(data_provider, model, config, device):
+def predict_for_provider(data_provider, model, config, device):
     dataset = config["encoder"](data_provider, **config["encoder_args"])
     batch_size = config["Test"].get("batch_size", len(dataset))
     num_workers = config["Data"]["num_workers"]
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
     y = np.array([sample[-1] for sample in data_provider.samples])
-    y_pred = test_model(model, dataloader, device)
+    y_pred = predict(model, dataloader, device)
     return y, y_pred
 
 def calculate_roc_auc(y, y_pred):
@@ -66,14 +66,14 @@ def plot_general_curves(y, y_pred, plot_path, model_name):
     plt.close()
     print(f"Precision-Recall curve saved as {save_path}\\n")
 
-def plot_top_10_curves(data_provider, model, config, device, plot_path, model_name, DATA_PROVIDER_ARGS):
+def plot_top_10_curves(data_provider, model, config, device, plot_path, model_name, data_provider_args):
     top_10_hlas = data_provider.top_10_hlas
     colors = plt.cm.get_cmap('tab10', 10)
 
     plt.figure(figsize=(8, 6))
     for index, hla in enumerate(top_10_hlas):
-        data_provider_hla = DataProvider(**DATA_PROVIDER_ARGS, specific_hla=hla)
-        y, y_pred = tmp(data_provider_hla, model, config, device)
+        data_provider_hla = DataProvider(**data_provider_args, specific_hla=hla)
+        y, y_pred = predict_for_provider(data_provider_hla, model, config, device)
         fpr, tpr, roc_auc = calculate_roc_auc(y, y_pred)
         plt.plot(fpr, tpr, lw=1.5, label=f'{hla} (area = {roc_auc:.2f})', color=colors(index))
         
@@ -90,7 +90,7 @@ def plot_top_10_curves(data_provider, model, config, device, plot_path, model_na
     plt.figure(figsize=(8, 6))
     for index, hla in enumerate(top_10_hlas):
         data_provider_hla = DataProvider(**DATA_PROVIDER_ARGS, specific_hla=hla)
-        y, y_pred = tmp(data_provider_hla, model, config, device)
+        y, y_pred = predict_for_provider(data_provider_hla, model, config, device)
         precision, recall, pr_auc = calculate_pr_auc(y, y_pred)
         plt.plot(recall, precision, lw=1.5, label=f'{hla} (area = {pr_auc:.2f})', color=colors(index))
     plt.xlabel('Recall')

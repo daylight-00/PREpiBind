@@ -14,9 +14,9 @@ see `docs/notes/2026-08-30-ref-rescore.md`.
 
 Run it in scratch, following the `0_raw` mirror convention:
 
-    mkdir -p /home/hwjang/project/260830/ref
-    cp *.py run.sh /home/hwjang/project/260830/ref/
-    cd /home/hwjang/project/260830/ref && python prep.py && sbatch run.sh
+    mkdir -p $SCRATCH/260830/ref
+    cp *.py run.sh $SCRATCH/260830/ref/
+    cd $SCRATCH/260830/ref && python prep.py && sbatch run.sh
     python verify.py
 
 Then snapshot the two prediction tables to `0_raw/260830/ref/`, which is where
@@ -28,4 +28,4 @@ whether the tool supports it) and `coverage.csv` (peptides asked for vs scored,
 per tool per allele).
 
 Tool versions: NetMHCIIpan **4.3g**, MixMHC2pred **2.0.2**, both from
-`/home/hwjang/project/250604/1_ref/`. Neither uses a GPU.
+`$SCRATCH/250604/1_ref/`. Neither uses a GPU.

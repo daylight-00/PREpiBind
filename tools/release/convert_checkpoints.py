@@ -5,7 +5,7 @@
     python tools/release/convert_checkpoints.py --check         # prove the ones on disk are those
     python tools/release/convert_checkpoints.py --check-legacy  # prove this is the code that made
                                                                 # the old prepi_esmc_small_* files
-    python tools/release/convert_checkpoints.py --manifest      # the table upload_plan.md quotes
+    python tools/release/convert_checkpoints.py --manifest      # the release table, for the cards
     python tools/release/convert_checkpoints.py --stage-ms      # both ms candidates, side by side
 
 Two tiers out of one source per arm:
@@ -735,7 +735,7 @@ def _suffix(tier):
 
 
 def do_manifest(bda, arms, tiers, out_dir):
-    """The markdown table upload_plan.md quotes.
+    """The markdown table the release notes quote.
 
     Measured from disk. A row whose file is not there falls back to the recorded values and is
     marked, and it is left out of the total: a manifest that quietly totals files nobody has
@@ -789,7 +789,7 @@ def main():
     m.add_argument("--write", action="store_true", help="produce the release files")
     m.add_argument("--check", action="store_true",
                    help="re-derive each into a scratch dir and byte-compare; writes nothing")
-    m.add_argument("--manifest", action="store_true", help="the markdown table for upload_plan.md")
+    m.add_argument("--manifest", action="store_true", help="the markdown table for the release notes")
     m.add_argument("--verify", action="store_true",
                    help="load each release file into the model the predict config builds, "
                         "strict=True, and check the fp32/fp16 relation and the stored epoch")

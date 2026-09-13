@@ -39,43 +39,22 @@ parameters. Nothing is quantised or pruned: this is `tensor.half()` of the float
 by `demo/build_demo_assets.py checkpoint`, which is a pure function of the training checkpoint and
 can be re-derived at any time.
 
-All four rows are the val_loss argmin of their arm. **Not yet published:** the files exist locally
-and nothing has been uploaded to HuggingFace; the sequence for doing so is
-`tools/release/upload_plan.md`.
+All four are the val_loss argmin of their arm.
 
 ## How these four were chosen
 
-Each arm was trained as 15 runs: three seeds (42, 100, 128) by five cross-validation folds.
-**Every number reported in the paper is a mean over those 15 runs.** A released checkpoint is one
-run out of the fifteen, the one with the **lowest validation loss** in its arm — the value in the
-table. **Validation loss is the selection criterion; the `Val ROC-AUC` in the training logs is
-invalid — `train.py` calls its own `roc_auc_score(outputs, labels)` with the arguments swapped, so
-21.7 % of the logged values fall outside [0, 1] — and it was never used.** No test-set quantity took
-part in the choice either. The val_loss column was re-derived on 2026-09-10 from
-`analysis/val_metrics.csv`; the numbers published before that date were minima over a filtered
-subset of the epoch lines and were too high.
-
-That correction moved one selection. The **ms** row was seed 100, fold 1 (true val_loss 0.13128)
-and is now seed 128, fold 3 (0.12274) — a different run of the same fifteen the paper averages for
-that arm, trained from the same 77,954-row `data/dataset/ms_ql/train.csv` under a byte-identical
-config. The research card sets out why the two are comparable. The other three arms kept the run
-they always had; only the number printed beside them changed.
-
-A single checkpoint therefore does not
-reproduce a paper number, and this float16 copy of it reproduces one even less exactly. The full
-comparison, mean over 15 runs against this run alone, is on the
-[research card](https://huggingface.co/daylight-00/prepibind).
+Each arm was trained as 15 runs — three seeds by five cross-validation folds — and every number in
+the paper is a mean over those 15. A released checkpoint is one of the fifteen, the one with the
+lowest validation loss in its arm, the value in the table. No test-set quantity took part. So a
+single checkpoint does not reproduce a paper number, and this float16 copy reproduces one less
+exactly still; the [research card](https://huggingface.co/daylight-00/prepibind) has the detail.
 
 ## This does not reproduce the research path bit for bit
 
-Two separate reasons, and both of them are accepted rather than fixed:
-
-1. **Half precision throughout.** The head runs in float16 and so does ESMC, against float32 head
-   and bfloat16 ESMC on the research path.
-2. **The demo encodes epitopes with ESMC at run time** instead of reading the precomputed store the
-   training and the paper's evaluation used. That alone makes bit-exactness impossible whatever
-   precision it runs in. On Colab's free tier the GPU is a **T4, which is pre-Ampere, so flash-attn
-   is off** and the runtime says so when it drops it.
+Two reasons, both accepted rather than fixed: the head and ESMC both run in float16, against a
+float32 head and bfloat16 ESMC on the research path; and the demo encodes epitopes with ESMC at run
+time instead of reading the precomputed store training and evaluation used, which makes bit-exactness
+impossible at any precision. On Colab's free T4 flash-attn is off as well, and the runtime says so.
 
 Measured, on 2,000 demo rows, this float16 path against the `as-trained` path:
 
@@ -86,9 +65,8 @@ Measured, on 2,000 demo rows, this float16 path against the `as-trained` path:
 | Spearman correlation | **0.99985** |
 | peak GPU memory | 1.95 GiB, against 2.95 GiB |
 
-Ranking is essentially preserved; individual scores move in the third decimal, and one row in two
-thousand moved by 0.06. If a decision turns on that, use the float32 checkpoints and the
-`as-trained` precision.
+Ranking is essentially preserved. If a decision turns on the third decimal, use the float32
+checkpoints and the `as-trained` precision.
 
 ## Input format
 

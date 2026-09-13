@@ -38,32 +38,16 @@ is shipped as a file.
 
 ```
 0_raw/250513/2_lomo/plots_HLA-DRB1~15:01_HLA-DRA~01:01/e5_s100/pred-esmc_small_fold0.csv
-     └────────────────────── identical to the path under /home/hwjang/project ──┘
+     └──────────────────────── identical to the path under the scratch root ────┘
 ```
 
 So a file's provenance *is* its path: `rp.source(rel)` is `SCRATCH / rel`, and
 `rp.find(abs_path)` goes back the other way.
 
-This matters. The snapshot previously flattened several scratch directories into one
-`<lr>_<seed>` level. Because `250513/1_bulk/1/plots/` and `250513/1_bulk/4/plots/`
-use the same seed directory names, they overwrote each other: 194 of the files the
-analyses need were missing or replaced, and nothing reported it. Mirroring makes
-that impossible by construction.
-
-### Clusters
-
-| alias | role | relevance here |
-| --- | --- | --- |
-| `abc` | ABO Cluster | produced every training/inference run in the snapshot |
-| `victor` | shared workstation | serves the official prepibind-web instance |
-| `alpha` | personal workstation | ran the dataset-organisation step |
-
-The scratch root is `/home/hwjang/project` on all three, so `src_cluster` is a
-single value (`abc`) and `victor`/`alpha` only consume the snapshot. The one
-exception is the three `hum_ani_full.csv` marked `lost`: dataset organisation ran
-on `alpha`, and they exist nowhere on `abc`. `tools/sync_snapshot.py` already
-reserves their paths, so copying them from `alpha` and re-syncing picks them up
-with no code change.
+Mirroring rather than flattening is deliberate: directories that share seed names at different
+scratch roots overwrite each other under a flattened layout, silently dropping files no one
+notices. Three `hum_ani_full.csv` are marked `lost` in the manifest — they were produced on a
+workstation that no longer holds them; `sync_snapshot.py` reserves their paths.
 
 ## Reading data
 
@@ -107,10 +91,7 @@ directories within them (`dir_filter`), which test set each row is scored agains
 (`test_for`), which label column (`target_for`), which learning rate the models are
 pinned to (`lr_filter`), and any externally published baseline rows (`extra_rows`).
 
-The same logic used to be copy-pasted into all seven notebooks, at 0.55-0.98
-pairwise similarity. That is how `header=None` came to be missing from exactly one
-copy - shifting every prediction by one row and depressing whole-set AUC by ~0.15 -
-and how `4_lomo` came to lack the `dir` filter the other analyses had.
+One implementation, not seven copies: the notebooks differ only in their `config.py`.
 
 ## How results are aggregated
 
@@ -130,22 +111,18 @@ three numbers with `ddof=1`. It is deliberately *not* the SD of all 15 fold/seed
 values: folds share a test set and are not independent replicates, so pooling them
 understates the variance that matters.
 
-This replaces the old `select_best()`, which took the best seed per fold - first by
-test ROC-AUC, later by `val_loss`. Selecting on the test metric inflates the
-reported number by a model-dependent amount; selecting on validation fixed the leak
-but still reported a maximum rather than a typical result. Reporting the mean and
-its spread across seeds answers the question the benchmark is actually asking.
+Selecting a best seed is what this replaces: on the test metric it leaks, and on validation it
+still reports a maximum rather than a typical result.
 
 Allele-wise and LOMO results reduce the same way and stop at **one value per allele
 or per withheld molecule**. That value, never the individual run, is the unit for
 box plots and for statistics - 15 runs of one model on one allele are not 15
 independent observations.
 
-Checkpoint selection *within* a run is unchanged, and is not free to change: it is
-the epoch with the lowest validation loss, which is what `prepibind/train.py` saved. The
-`Val ROC-AUC` in `train.log` cannot be used, because train.py calls its own
-`roc_auc_score` with the arguments swapped and 21% of the logged values fall
-outside `[0,1]`. See `tools/parse_train_logs.py`.
+Checkpoint selection *within* a run is the epoch with the lowest validation loss, which is what
+`prepibind/train.py` saved. The `Val ROC-AUC` in `train.log` is unusable: `train.py` calls
+`roc_auc_score` with its arguments swapped, and 21 % of the logged values fall outside [0, 1]. See
+`tools/parse_train_logs.py`.
 
 ### Outputs
 
@@ -174,30 +151,20 @@ is what makes the five methods commensurable - the beta is the only unit all of 
 have. Everything downstream is then a fully paired Wilcoxon signed-rank test,
 Holm-corrected across the pairs in a panel.
 
-The old notebooks instead used Mann-Whitney U whenever DeepNeo was involved and
+`figures/tab2_pooled_benchmark.ipynb` reports the collapse alongside two alternatives — the full
+47 pairs without DeepNeo, and the 32 betas with exactly one pairing — and all three agree on every
+conclusion.
 
-```python
-wilcoxon(a.iloc[:min_len], b.iloc[:min_len])
-```
+## Three guards, each against a silent wrong number
 
-for everything else - a paired test that pairs by *row position* and drops the tail.
-`figures/tab2_pooled_benchmark.ipynb` reports the collapse alongside two alternatives (the full 47
-pairs without DeepNeo, and the 32 betas with exactly one pairing); all three agree on
-every conclusion.
+- `read_pred()` always passes `header=None`. These files have no header row, so without it pandas
+  consumes the first prediction as a column name.
+- `add_metrics()` treats a prediction/test length mismatch as an error rather than merging on index,
+  which is an inner join and would score on whichever rows happen to line up.
+- `pin_one_lr()` raises if more than one learning rate survives `lr_filter`, rather than breaking the
+  tie with the test metric.
 
-## Two guards that exist because their absence caused silent wrong numbers
-
-- `read_pred()` always passes `header=None`. These files have no header row, so
-  without it pandas consumes the first prediction as a column name.
-- `add_metrics()` treats a prediction/test length mismatch as an error. The old code
-  merged on index, which is an inner join, so a mismatched pair silently scored on
-  whichever rows lined up. `3_ic` was pairing 47666 full-dataset predictions with a
-  14117-row ic50 test set and reporting roc_auc around 0.51.
-- `pin_one_lr()` raises if more than one learning rate survives `lr_filter`. The old
-  code broke that tie with the test metric, which is the same leak as seed selection
-  one level up.
-
-## Moving the snapshot between clusters
+## Moving the snapshot between machines
 
 ```bash
 tools/snapshot.sh pack                # -> 0_raw.tar.zst  (~273 MB)

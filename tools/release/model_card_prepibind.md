@@ -35,77 +35,24 @@ changed.
 | `prepibind_ic50_1000_s42_f1.pt` | IC50, binder threshold < 1000 nM | 42 | 1 | 0.49456 | `configs/predict/config_ic50_1000.py` |
 
 Each is 213.0 MiB, a one-key `{"model_state_dict": ...}` dict of 64 float32 tensors, 55,820,161
-parameters. The seed and the fold are in the filename because they are part of what the file is.
+parameters. md5, in table order: `e0d105b1…`, `fd30ab20…`, `c589a329…`, `708a3753…`.
 
-All four rows are the val_loss argmin of their arm. **Not yet published:** the files exist locally
-and nothing has been uploaded to HuggingFace; that is a human step, and the sequence is
-`tools/release/upload_plan.md`.
+All four are the val_loss argmin of their arm.
 
 ## How these four were chosen, and why they are not the paper's numbers
 
-Each arm was trained as **15 runs**: three seeds (42, 100, 128) by five cross-validation folds.
-**Every number reported in the paper is a mean over those 15 runs.**
+Each arm was trained as **15 runs**: three seeds (42, 100, 128) by five cross-validation folds, and
+**every number reported in the paper is a mean over those 15**. A released checkpoint is one of the
+fifteen — the one with the lowest validation loss, the value in the table above. No test-set
+quantity took part in the choice. For a benchmark comparison, use the paper's means, not one
+checkpoint.
 
-A released checkpoint is one single run out of the fifteen — the one with the **lowest validation
-loss** in its arm, the value in the table above. **Validation loss is the selection criterion; the
-`Val ROC-AUC` in the training logs is invalid — `train.py` defines `roc_auc_score(outputs, labels)`
-and calls it with the arguments swapped, so 21.7 % of the logged values fall outside [0, 1] — and
-it was never used for anything.** No test-set quantity took part in the choice either.
-
-**The ms row changed on 2026-09-10, and only the ms row.** It was seed 100, fold 1 from
-`250527/1_ms_re`, whose true val_loss is 0.13128. The corrected parse puts the arm's argmin at seed
-128, fold 3 from `260829/ms`, 0.12274. That run was already one of the fifteen this arm averages:
-`analysis/scoring/2_ms/per_run_results.csv` draws 9 of them from `250527/1_ms_re` and 6 from
-`260829/ms` (seed 100 fold 4, and seed 128 folds 0-4). The two directories carry byte-identical
-`config_global.json` and `config_esmc_small.py`, both log `Total samples: 77954` from the one
-`data/dataset/ms_ql/train.csv`, and `260829`'s replicate of three seed-42 folds reproduces the
-earlier root's validation losses exactly (0.14181, 0.14277, 0.14074). So this is a re-selection
-inside the arm, on a criterion that did not change — not a new model, and not a new comparison.
-
-The val_loss values above were re-derived on 2026-09-10 from `analysis/val_metrics.csv`, after a
-regex in `analysis/tools/parse_train_logs.py` was fixed: it required an unsigned number for
-`Val ROC-AUC`, so every epoch line carrying one of those negative values was dropped and the
-recorded minimum was a minimum over a filtered subset. It could only ever come out too high, and on
-46.7 % of runs it did. The training itself was never affected — `train.py` checkpoints on the true
-minimum — which is why the epoch stored inside each of these four files (20, 27, 28, 28) matches the
-corrected argmin and not the old one.
-
-So a released checkpoint does not reproduce a paper number and is not meant to. It scores a little
-above the mean on most metrics, because it was picked for a quantity correlated with test
-performance — though not on all of them: F1 comes out slightly below the mean in the qualitative and
-ic50_1000 arms. Both are below:
-
-| arm | metric | paper (mean ± sd over 15 runs) | this checkpoint alone |
-|---|---|---|---|
-| qualitative | ROC AUC | 0.9193 ± 0.0028 | 0.9211 |
-| | PR AUC | 0.9448 ± 0.0019 | 0.9460 |
-| | F1 | 0.8586 ± 0.0037 | 0.8582 |
-| | accuracy | 0.8375 ± 0.0038 | 0.8391 |
-| | MCC | 0.6683 ± 0.0084 | 0.6736 |
-| ms | ROC AUC | 0.9897 ± 0.0009 | 0.9911 |
-| | PR AUC | 0.9865 ± 0.0012 | 0.9884 |
-| | F1 | 0.9439 ± 0.0042 | 0.9502 |
-| | accuracy | 0.9563 ± 0.0030 | 0.9612 |
-| | MCC | 0.9083 ± 0.0063 | 0.9186 |
-| ic50_500 | ROC AUC | 0.8375 ± 0.0039 | 0.8436 |
-| | PR AUC | 0.7429 ± 0.0055 | 0.7520 |
-| | F1 | 0.6764 ± 0.0146 | 0.6805 |
-| | accuracy | 0.7685 ± 0.0035 | 0.7739 |
-| | MCC | 0.4979 ± 0.0107 | 0.5067 |
-| ic50_1000 | ROC AUC | 0.8347 ± 0.0044 | 0.8401 |
-| | PR AUC | 0.8024 ± 0.0057 | 0.8093 |
-| | F1 | 0.7399 ± 0.0083 | 0.7322 |
-| | accuracy | 0.7554 ± 0.0039 | 0.7575 |
-| | MCC | 0.5101 ± 0.0092 | 0.5110 |
+Quote the validation losses from `analysis/val_metrics.csv` in the repository. The `val_loss` and
+`val_auc` columns of `analysis/scoring/*/per_run_results.csv` are not usable for this: the first
+predates a parser fix, and the second comes from a `roc_auc_score` call with its arguments swapped.
 
 Held-out test sets, never used for selection: 48,352 rows (qualitative), 33,490 (ms), 14,150 (both
-IC50 arms). The per-run table these come from is `analysis/scoring/*/per_run_results.csv` in the
-repository. Ignore its `val_auc` column, and the `Val ROC-AUC` in the training logs it comes from:
-the `roc_auc_score` arguments are swapped and the values are meaningless. **Ignore its `val_loss`
-column too** — it was written before the parser fix and is still the filtered minimum, 0.36951 for
-the qualitative checkpoint and 0.14216 for the ms one. The validation losses in this card come from
-`analysis/val_metrics.csv`, which was regenerated on 2026-09-10, and that is the only file to quote
-them from.
+IC50 arms).
 
 ## Training data
 
@@ -231,17 +178,11 @@ back to float32 and says so.
 
 ## Licence
 
-**MIT** for these weights and for the PREpiBind code, same as the repository.
-
-The backbone is not ours, but it is also MIT. ESMC 300M moved to Chan Zuckerberg Biohub:
-[`biohub/esmc-300m-2024-12`](https://huggingface.co/biohub/esmc-300m-2024-12) is ungated and its card
-is tagged `mit` + `other`, and `esm` 3.4.0 — the release the vendored `prepibind/esmc/` source is
-copied from — ships a plain MIT licence, "Copyright 2026 Chan Zuckerberg Biohub, Inc.". These
-checkpoints were produced by training on ESMC 300M embeddings. Checked 2026-09-10; the repository's
-`THIRD_PARTY_NOTICES.md` records the evidence and every other dependency.
-
-Training data derives from the IEDB Export v3 (free to use, asks to be cited) and allele sequences
-from IPD-IMGT/HLA and UniProt.
+**MIT** for these weights and for the PREpiBind code. The backbone is not ours but is also MIT:
+ESMC 300M is now [`biohub/esmc-300m-2024-12`](https://huggingface.co/biohub/esmc-300m-2024-12), and
+`esm` 3.4.0 — the release the vendored `prepibind/esmc/` source comes from — ships a plain MIT
+licence. Training data derives from IEDB (CC BY 4.0) and allele sequences from IPD-IMGT/HLA
+(CC BY-NoDerivs) and UniProt (CC BY 4.0). The repository's `THIRD_PARTY_NOTICES.md` has the detail.
 
 ## Citation
 

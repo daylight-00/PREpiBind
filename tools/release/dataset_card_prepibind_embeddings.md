@@ -92,18 +92,10 @@ three changed keys:
 | ms | 450 of 77,954 (0.58 %) | 215 of 33,490 (0.64 %) |
 | ic50 | 218 of 33,004 (0.66 %) | 85 of 14,150 (0.60 %) |
 
-Three consequences worth stating plainly:
-
-- **This file carries no HDF5 attributes recording the fix**, so the difference is not detectable
-  from the file itself. That is what this section is for. (The sibling `…_0329.h5` store does carry
-  `h2_chain_fix*` attributes; this one does not.)
-- Every human HLA embedding is unchanged. Anything that does not touch mouse H2 is unaffected.
-- The 18 mouse H2 chains, these three included, **are** part of the four training arms. The affected
-  rows are a real, if small, part of what the released checkpoints were fit on, which is why this is
-  disclosed rather than dismissed.
-
-If you re-train on this store you will get slightly different H2 behaviour from the released
-checkpoints. If you run inference on human alleles, you will not.
+The file carries no HDF5 attribute recording the fix, so this section is the only place the
+difference is visible. Every human HLA embedding is unchanged: re-training on this store gives
+slightly different H2 behaviour from the released checkpoints, and inference on human alleles is
+unaffected.
 
 ## Usage
 

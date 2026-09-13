@@ -96,42 +96,9 @@ All files were verified on 2026-09-10.
 
 ---
 
-## What differs between hosts, for this deposit
+## What differs between hosts
 
-Input to a decision. Not a recommendation, and the host is explicitly still open.
-
-**Size is not a discriminator.** 545 MiB clears every candidate comfortably. Zenodo's default
-per-record limit is 50 GB, figshare's public-item allowance is effectively unbounded with a per-file
-cap far above this, and institutional repositories that cap at 1-2 GB would still take it. Nothing
-here needs a quota request, and nothing here should be chosen on size.
-
-**Versioning and DOI granularity is the discriminator.** This snapshot has already been repacked
-once: the previous archive predates one experiment directory and cannot reproduce the current
-scoring tables. If review adds a run, the snapshot changes again, and the deposit needs a new
-version whose old version stays resolvable, because the submitted manuscript will already cite a
-DOI.
-
-- Zenodo mints a version DOI per upload and a **concept DOI** that always resolves to the latest.
-  Citing the concept DOI in the manuscript survives a re-upload; citing the version DOI pins the
-  exact bytes. Both are available, which is the property that matters here.
-- figshare versions an item in place and appends a version suffix to the DOI, with the base DOI
-  resolving to the newest. Functionally similar; the older version stays reachable.
-- Institutional repositories vary most on exactly this point. Some issue no DOI at all, some issue
-  one per deposit with no versioning, in which case a corrected snapshot becomes a second,
-  unlinked record. Confirm before choosing one.
-
-**Code DOI versus data DOI.** Zenodo's GitHub integration mints a DOI for a tagged release
-automatically, which would give the software and the data separate DOIs under one project. That is
-arguably the right granularity: the code changes on a different schedule from the data. figshare and
-most institutional repositories require the code to be uploaded as a file, which fixes it to the
-data's version cycle.
-
-**Third-party redistribution.** File 2 is 240 MB of IEDB data redistributed under our DOI. Zenodo
-and figshare accept the uploader's licensing assertion; several institutional repositories review
-third-party content before publishing. Whichever host is chosen, the underlying question of whether
-we may redistribute this export at all is open and is upstream of the host choice.
-
-**Longevity claims.** Zenodo commits to the lifetime of the CERN data centre. figshare has a
-preservation arrangement through CLOCKSS. Institutional custodianship is tied to the institution.
-For a five-year availability statement in the manuscript, any of the three is defensible; they
-differ in what happens after that.
+Any host that mints a DOI, accepts 545 MiB in three files and keeps them retrievable will do. The
+choices that actually differ: whether the deposit can be versioned in place after upload, whether a
+GitHub release can be archived alongside it to give the code its own DOI, and what the size ceiling
+is. Decide those before uploading; nothing in this directory depends on the answer.
