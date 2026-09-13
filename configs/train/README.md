@@ -1,4 +1,27 @@
 # Train
+
+One config per representation. The filenames use the size words the code was written with; this is
+what each one actually is, and the same mapping is published as
+`supplementary_data/prepibind_D12_method_key.csv`:
+
+| config | representation | embedding dim | trained parameters |
+|---|---|---:|---:|
+| `config_esmc_small.py` | ESMC 300M | 960 | 55,820,161 |
+| `config_esmc_medium.py` | ESMC 600M | 1152 | 80,365,825 |
+| `config_esmc_large.py` | ESMC 6B | 2560 | 396,661,761 |
+| `config_esm3_small.py` | ESM3 Small | 1536 | 142,838,785 |
+| `config_esm3_medium.py` | ESM3 Medium | 2560 | 396,661,761 |
+| `config_esm3_large.py` | ESM3 Large | 6144 | 2,284,204,033 |
+| `config_af3.py` | AlphaFold 3 | — | 24,823,041 |
+| `config_boltz.py` | Boltz-1 | — | 24,823,041 |
+| `config_chai.py` | Chai-1 | — | 48,629,505 |
+| `config_blosum.py` | BLOSUM62 baseline | — | 39,450 |
+| `config_deepneo.py` | DeepNeo re-implementation | — | — |
+
+`config_esmc_small.py` is the released model's config. The embedding dimension is `hla_dim_s` /
+`epi_dim_s` in each file; the structure backends read side-chain stores, whose width depends on the
+pair reduction.
+
 ## Workflow
 ```mermaid
 flowchart TD
