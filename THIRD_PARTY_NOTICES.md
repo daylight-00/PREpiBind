@@ -108,17 +108,32 @@ not redistributed here", which was wrong — derived rows from it are shipped in
 
 **IPD-IMGT/HLA and IPD-MHC — CC BY-NoDerivs; permission has not been asked.**
 
-- [`ebi.ac.uk/ipd/imgt/hla/licence/`](https://www.ebi.ac.uk/ipd/imgt/hla/licence/): "We have chosen
-  to apply the Creative Commons Attribution-NoDerivs Licence to all copyrightable parts of our
-  databases, which includes the sequence alignments. [...] We are strongly opposed to the mirroring
-  of the data contained on our sites [...] **If you intend to distribute a modified version of our
-  data, you must ask us for permission first.**"
-  [`ebi.ac.uk/ipd/licence/`](https://www.ebi.ac.uk/ipd/licence/) says the same for IPD-MHC.
+- **The sequences here came from the database's GitHub distribution,
+  [`github.com/ANHIG/IMGTHLA`](https://github.com/ANHIG/IMGTHLA), not from a web download**, so that
+  repository's own `LICENCE.md` is the operative notice. Read 2026-09-13, it states the same terms
+  the IPD website does: "We have chosen to apply the Creative Commons Attribution-NoDerivs License
+  to all copyrightable parts of our databases, which includes the sequence alignments. [...] We are
+  strongly opposed to the mirroring of the data contained on our sites [...] **If you intend to
+  distribute a modified version of our data, you must ask us for permission first, please contact
+  ipdsubs [at] anthonynolan [dot] org**".
+- **It asks for three citations, not one**, and all three are given in the paper:
+  Barker DJ, Natarajan RHL, Cooper MA, Hopper SJF, Yates AD, Parham P, Marsh SGE, Robinson J,
+  *The IPD-IMGT/HLA Database: recent developments in sequence submission*, Nucleic Acids Research
+  (2026) 54(D1):D1152--D1158, doi:10.1093/nar/gkaf1218; Robinson J, Barker D, Marsh SGE,
+  *25 years of the IPD-IMGT/HLA Database*, HLA (2024) 103(6):e15549; and Robinson J, Malik A,
+  Parham P, Bodmer JG, Marsh SGE, *IMGT/HLA -- a sequence database for the human major
+  histocompatibility complex*, Tissue Antigens (2000) 55:280--287.
+- For the 20 BoLA, SLA and Mamu rows the operative page is
+  [`ebi.ac.uk/ipd/licence/`](https://www.ebi.ac.uk/ipd/licence/), which says the same for IPD-MHC.
 - What this repository ships against that: `pipeline/preprocess/mhc_sequences/MHC2MSA.csv` is a
   12,212-row **mirror** of the class II alignment, and `HLA2_IMGT.csv` and the three
   `data/mhc_mapping/` tables are **modified versions** of it — gap characters stripped, four-field
   names collapsed to two-field, sequences sliced to domain windows. Of the 154 published rows, 116
   are IPD-IMGT/HLA and 20 are IPD-MHC (BoLA, SLA, Mamu).
+- **The release is 3.59.0** (2025-01-15). No artifact on disk records it, so it was recovered from
+  the distribution's own `Allelelist_history.txt` on 2026-09-13: of the 110 releases it covers,
+  **exactly one** contains all 12,212 allele names in `MHC2MSA.csv`. 3.58.0 is missing 187 of them
+  and 3.60.0 has renamed or deleted 14, so the fit is unique.
 - **No permission was requested and none has been granted.** Treat these six files as unresolved
   rather than cleared. NoDerivs restricts *distributing* adaptations, not using them, so the
   checkpoints, the training runs and every published number are unaffected. The two distributed

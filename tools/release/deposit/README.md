@@ -212,14 +212,16 @@ deliberate act by whoever owns `oup-authoring-template.tex`.
    decisions with hwjang. If the answer is no, the deposit ships `draft.csv.tar.zst` plus the
    export's checksums and a download URL, and `make datasets` stage 1 stops being reproducible from
    the deposit alone. The rest is unaffected.
-3. **Which export is "2025-04-20".** Measured above: the paper's export is stamped 2025-04-22 and
-   was downloaded 2025-04-24. Three files in the public repository and one commented-out manuscript
-   sentence say 2025-04-20. Somebody has to say which is right before the deposit's description
-   states a date.
-4. **No IPD-IMGT/HLA release number anywhere.** `pipeline/preprocess/mhc_sequences/HLA2_IMGT.csv`
-   and `MHC2MSA.csv` (12,212 rows) carry no version, and neither do the READMEs. The Data
-   Availability paragraph currently cites the database without a release. A release number would
-   make `data/mhc_mapping/` reproducible; without one it is take-it-as-given.
+3. **[RESOLVED 2026-09-13] Which export is "2025-04-20".** It is none of them: the zip member is
+   stamped 2025-04-21 20:01:12 US/Pacific (2025-04-22 KST) and was downloaded 2025-04-24, and no
+   artifact carries 2025-04-20. `paths.py`, `pipeline/preprocess/README.md`, the body Methods
+   sentence and two Supplementary sentences now say **2025-04-21**; the deposit description should
+   use the same date plus the sha256.
+4. **[RESOLVED 2026-09-13] The IPD-IMGT/HLA release is 3.59.0** (2025-01-15). Still recorded in no
+   artifact of ours, but recovered from the source distribution: of the 110 releases in
+   `Allelelist_history.txt` at `github.com/ANHIG/IMGTHLA`, exactly one contains all 12,212 allele
+   names in `MHC2MSA.csv` -- 3.58.0 is missing 187 of them and 3.60.0 has renamed or deleted 14.
+   The manuscript now names the release.
 5. **The HuggingFace repositories do not exist yet.** `tools/release/upload_plan.md` is unrun and
    needs a write token nobody here has. The Data Availability paragraph names four HF URLs that
    currently 401. Deposit and HF upload should land together, or the paragraph names dead links.

@@ -1,13 +1,11 @@
 # Data Availability — draft paragraph
 
-**This is a draft. The manuscript has not been edited.** It replaces the current
-`\section{Data Availability}` in `IMG/paperwork/body/oup-authoring-template.tex`, which today is one
-sentence naming GitHub plus a commented-out sentence naming IEDB and IPD-IMGT/HLA.
-
-Applying it is a separate act by whoever owns that file. Two conventions apply and are not
-pre-applied here: a content change of this size is wrapped in `\hy{}` per
-`decisions/manuscript-edit-conventions.md`, and Data Availability is excluded from the body word
-count, so its length does not compete with the 5,800-word target.
+**APPLIED 2026-09-13.** The manuscript's `\section{Data Availability}` now carries this paragraph,
+wrapped in `\begin{hyed}` per `decisions/manuscript-edit-conventions.md`, with three differences
+from the draft below: the two DOI sentences are dropped (the deposit is deferred, so no DOI exists),
+the reproducibility claim reads "every *quantitative* figure and table" because Figure 1 is a
+drawing, and the database sources carry their citations and terms. Kept here as the record of what
+was drafted and what the placeholders resolved to.
 
 ## Placeholders
 
@@ -15,8 +13,8 @@ count, so its length does not compete with the 5,800-word target.
 |---|---|
 | `<DATA-DOI>` | the archival deposit for this study. Does not exist. See `README.md` §5 |
 | `<CODE-DOI>` | a DOI for the tagged source release, if the code is deposited separately |
-| `<IEDB-DATE>` | the export date. **Unresolved.** The file is stamped 2025-04-22; three places in the repository and the current commented-out sentence say 2025-04-20. See `README.md` §1.2 |
-| `<IPD-RELEASE>` | the IPD-IMGT/HLA release. **Not recorded anywhere.** See `README.md` §5 item 4 |
+| `<IEDB-DATE>` | **Resolved 2026-09-13: 2025-04-21**, the stamp on the retained zip member. The 2025-04-20 that three files and the commented-out sentence carried has no artifact behind it and was corrected everywhere |
+| `<IPD-RELEASE>` | **Resolved 2026-09-13: 3.59.0** (2025-01-15). Recovered from `Allelelist_history.txt` in `github.com/ANHIG/IMGTHLA`: exactly one of its 110 releases contains all 12,212 names in `MHC2MSA.csv` |
 
 ## Draft
 
