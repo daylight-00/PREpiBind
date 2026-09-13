@@ -211,3 +211,8 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+# The IPD-IMGT/HLA alignment is fetched, not redistributed -- see
+# pipeline/preprocess/fetch_mhc_alignment.py, which writes these.
+pipeline/preprocess/mhc_sequences/MHC2MSA.csv
+pipeline/preprocess/mhc_sequences/HLA2_IMGT.csv
+pipeline/preprocess/mhc_sequences/_alignments/

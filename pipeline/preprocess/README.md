@@ -16,6 +16,7 @@ that are reconstructions rather than producers (`build_beta.py`, `apply_h2_corre
 
 | | notebook | produces |
 |---|---|---|
+| — | `fetch_mhc_alignment.py`  | `mhc_sequences/{HLA2_IMGT,MHC2MSA}.csv` — the IPD-IMGT/HLA alignment, downloaded, **not shipped**. Stage 0 needs it |
 | 0 | `0_mhc_sequences.ipynb`   | `data/mhc_mapping/` — allele sequences and their domain windows |
 | 1 | `1_iedb_to_draft.ipynb`   | `draft.csv` — class II, linear peptides, no mutants |
 | 2 | `2_arm_qualitative.ipynb` | `data/dataset/full/` |
@@ -46,20 +47,27 @@ chain is run from the 2025-04-21 export (the zip member of the retained
 `mhc_ligand_full_single_file.zip` is stamped 2025-04-21 20:01:12 US/Pacific; earlier revisions of
 this file said 2025-04-20, a date no artifact supports).
 
-Two files here are inputs rather than products:
+One file here is an input rather than a product: `data/unique_epitope_whole.csv`, the epitope key
+list the embedding stores were built against. It covers every epitope in the four arms plus 5,550
+that were embedded and never trained on.
 
-- `data/unique_epitope_whole.csv` — the epitope key list the embedding stores were built against.
-  It covers every epitope in the four arms plus 5,550 that were embedded and never trained on.
-- `mhc_sequences/HLA2_IMGT.csv` — the IPD-IMGT/HLA class II alignment stage 0 reads, one row per
-  two-field allele name.
+Stage 0's other input, the IPD-IMGT/HLA class II alignment, is **not in this repository**. IPD-IMGT/HLA
+is CC BY-NoDerivs and asks to be linked to rather than mirrored, so:
 
-The other three files in `mhc_sequences/` are the record of how that alignment and the domain
-windows were made, by hand, before this chain existed. No code reads them, and they are kept
-because nothing else explains where those two things came from:
+```bash
+python pipeline/preprocess/fetch_mhc_alignment.py          # ~4 MB from github.com/ANHIG/IMGTHLA
+```
+
+downloads release 3.59.0 — the one the paper used — and rebuilds both tables into `mhc_sequences/`,
+where stage 0 expects them. `--check` verifies without writing. `MHC2MSA.csv` comes back
+**byte-identical** to the copy this repository used to ship (sha256 `d492c29e…`); `HLA2_IMGT.csv`
+returns every one of its 7,267 rows with the same residues, plus 16 two-field names that did not
+exist in the older generation, and normalises the two gap characters to `*`.
+
+The two files that do ship are the hand decisions behind it, which nothing upstream records:
 
 | file | what it records |
 |---|---|
-| `MHC2MSA.csv`         | the raw IPD-IMGT/HLA alignment, 12,212 rows under full four-field names |
 | `filtered_manual.json`| the 296 cases where several four-field names collapsed to one two-field name, with the sequence that was chosen and how many entries backed it |
 | `range_final.txt`     | the hand alignment behind the peptide-binding windows in `HLA2_IMGT_MSA_idx.csv` |
 

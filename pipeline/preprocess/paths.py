@@ -44,6 +44,8 @@ MHC_MAPPING = os.path.join(DATA, "mhc_mapping")
 UNIQUE_EPITOPES = os.path.join(DATA, "unique_epitope_whole.csv")
 
 # --- MHC sequence stage ---------------------------------------------------------------------
-# Stage 0 reads HLA2_IMGT.csv from here. The other three files in mhc_sequences/ are the record of
-# how it and the domain windows were made by hand; no code reads them. See the README.
+# Stage 0 reads HLA2_IMGT.csv from here. It is NOT in the repository: the IPD-IMGT/HLA alignment is
+# fetched rather than redistributed, so run fetch_mhc_alignment.py first and it writes both that
+# file and MHC2MSA.csv here. filtered_manual.json and range_final.txt do ship -- they are the hand
+# decisions behind the collapse and the domain windows. See the README.
 MHC_SRC = os.path.join(HERE, "mhc_sequences")

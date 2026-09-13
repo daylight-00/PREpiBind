@@ -75,6 +75,16 @@ def main():
               file=sys.stderr)
         return 2
 
+    # Stage 0 reads an alignment this repository does not ship. Fail with the command, not a
+    # FileNotFoundError from inside a notebook kernel.
+    if any(s[0] == 0 for s in todo):
+        alignment = os.path.join(P.MHC_SRC, "HLA2_IMGT.csv")
+        if not os.path.exists(alignment):
+            print(f"stage 0 needs {alignment}, which is fetched rather than shipped:\n"
+                  f"    python pipeline/preprocess/fetch_mhc_alignment.py",
+                  file=sys.stderr)
+            return 2
+
     os.makedirs(P.WORK, exist_ok=True)
     for s in todo:
         run(s)

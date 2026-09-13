@@ -48,6 +48,9 @@ scoring:
 # The arm notebooks write the *_beta.csv files themselves. build_beta.py reconstructs the same
 # derivation for checking; running it with --write would replace four published files with
 # content-equal but byte-different copies, so it stays out of this target. `make verify` runs it.
+mhc-alignment:
+	$(PY) pipeline/preprocess/fetch_mhc_alignment.py
+
 datasets:
 	$(PY) pipeline/preprocess/run_all.py
 

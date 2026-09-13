@@ -296,8 +296,10 @@ MIT **for the code**, see [LICENSE](LICENSE) — `prepibind/`, `configs/`, `demo
 `analysis/`, `supplementary_data/` and `tools/`.
 
 **The data is not MIT.** `data/`, `demo/data/` and `analysis/figures/data/` are derived from IEDB
-(CC BY 4.0), IPD-IMGT/HLA and IPD-MHC (CC BY-NoDerivs, permission for the modified tables not yet
-obtained) and UniProt (CC BY 4.0). Per-file terms are in [data/LICENSE.md](data/LICENSE.md).
+(CC BY 4.0), IPD-IMGT/HLA and IPD-MHC (CC BY-NoDerivs) and UniProt (CC BY 4.0). The IPD-IMGT/HLA
+alignment is not redistributed here -- `pipeline/preprocess/fetch_mhc_alignment.py` downloads it
+from [`github.com/ANHIG/IMGTHLA`](https://github.com/ANHIG/IMGTHLA) at release 3.59.0. Per-file
+terms are in [data/LICENSE.md](data/LICENSE.md).
 
 `prepibind/esmc/` is vendored from `esm` 3.4.0 and is MIT as well,
 but under a different copyright holder — "Copyright 2026 Chan Zuckerberg Biohub, Inc." — so its

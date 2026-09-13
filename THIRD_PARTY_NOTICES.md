@@ -15,7 +15,7 @@ neither describes nor can grant them. See the dated data-licence note below.
 
 | What | Where | Terms |
 |---|---|---|
-| HLA sequences and the domain windows derived from them | `data/mhc_mapping/`, `demo/data/mhc_mapping_demo.csv`, `pipeline/preprocess/mhc_sequences/`, one member of `analysis/figures/data/figure_inputs.tar.zst` | IPD-IMGT/HLA (human) and IPD-MHC (BoLA, SLA, Mamu), both **CC BY-NoDerivs**. **Redistributing these tables needs IPD's prior permission, which has not been obtained** — see the dated note below. |
+| HLA sequences cut to their peptide-binding domains | `data/mhc_mapping/`, `demo/data/mhc_mapping_demo.csv`, one member of `analysis/figures/data/figure_inputs.tar.zst` | IPD-IMGT/HLA release 3.59.0 (human) and IPD-MHC (BoLA, SLA, Mamu), both **CC BY-NoDerivs**, with the citations below. The alignment itself is **not** redistributed: `pipeline/preprocess/fetch_mhc_alignment.py` downloads it from `github.com/ANHIG/IMGTHLA`. |
 | H2 (murine) chain sequences, 18 rows of the same tables | `data/mhc_mapping/` | UniProt, **CC BY 4.0**. Free to redistribute in modified form with attribution. |
 | Epitope–allele rows derived from IEDB — 774,446 rows in `data/dataset/`, plus the epitope key list, the demo input and three tables inside `figure_inputs.tar.zst` | `data/dataset/`, `data/unique_epitope_whole.csv`, `demo/data/dataset_demo.csv`, `analysis/figures/data/figure_inputs.tar.zst` | **CC BY 4.0**, the licence IEDB states for its data. These are *modified* IEDB data — filtered, relabelled and re-split. Attribution and snapshot identity below. |
 | ESMC encoder source, vendored from `esm` 3.4.0, modified as each file's header records | `prepibind/esmc/`, licence at `prepibind/esmc/LICENSE-esm.md` | **MIT** — the same terms as the rest of this repository, but a different copyright holder: "Copyright 2026 Chan Zuckerberg Biohub, Inc.". That is why the licence file travels with the directory. `rotary.py` additionally carries EleutherAI/HuggingFace's Apache-2.0 header, a separate grant that came with the file upstream. |
@@ -106,52 +106,41 @@ not redistributed here", which was wrong — derived rows from it are shipped in
 - **`data/` is CC BY 4.0, not MIT.** The repository's `LICENSE` is MIT and covers the code; it does
   not and cannot cover these rows, whose terms require attribution that MIT does not.
 
-**IPD-IMGT/HLA and IPD-MHC — CC BY-NoDerivs; permission has not been asked.**
+**IPD-IMGT/HLA and IPD-MHC — CC BY-NoDerivs.**
 
-- **The sequences here came from the database's GitHub distribution,
-  [`github.com/ANHIG/IMGTHLA`](https://github.com/ANHIG/IMGTHLA), not from a web download**, so that
-  repository's own `LICENCE.md` is the operative notice. Read 2026-09-13, it states the same terms
-  the IPD website does: "We have chosen to apply the Creative Commons Attribution-NoDerivs License
-  to all copyrightable parts of our databases, which includes the sequence alignments. [...] We are
-  strongly opposed to the mirroring of the data contained on our sites [...] **If you intend to
-  distribute a modified version of our data, you must ask us for permission first, please contact
-  ipdsubs [at] anthonynolan [dot] org**".
-- **It asks for three citations, not one**, and all three are given in the paper:
-  Barker DJ, Natarajan RHL, Cooper MA, Hopper SJF, Yates AD, Parham P, Marsh SGE, Robinson J,
+- **Source.** The HLA sequences came from the database's own distribution,
+  [`github.com/ANHIG/IMGTHLA`](https://github.com/ANHIG/IMGTHLA), **release 3.59.0** (2025-01-15).
+  That repository's `LICENCE.md` is the notice that governs them: "We have chosen to apply the
+  Creative Commons Attribution-NoDerivs License to all copyrightable parts of our databases, which
+  includes the sequence alignments. [...] We are strongly opposed to the mirroring of the data
+  contained on our sites [...] rather than mirror the information, appropriate links are provided
+  where applicable."
+- **The alignment is not redistributed here.** `pipeline/preprocess/fetch_mhc_alignment.py`
+  downloads it from that repository at release 3.59.0 and rebuilds the two tables stage 0 reads.
+  What this repository does ship, in `data/mhc_mapping/` and `demo/data/mhc_mapping_demo.csv`, is
+  154 rows of sequence with the alignment gaps removed and each chain cut to its peptide-binding
+  domain: 116 HLA, 18 murine H2 from UniProt, and 20 BoLA, SLA and Mamu from IPD-MHC. The window
+  coordinates and the collapse decisions behind them are ours
+  (`mhc_sequences/{range_final.txt,filtered_manual.json}`).
+- **Citations, in the form `LICENCE.md` asks for.** It lists three, and all three are cited in the
+  paper: Barker DJ, Natarajan RHL, Cooper MA, Hopper SJF, Yates AD, Parham P, Marsh SGE, Robinson J,
   *The IPD-IMGT/HLA Database: recent developments in sequence submission*, Nucleic Acids Research
   (2026) 54(D1):D1152--D1158, doi:10.1093/nar/gkaf1218; Robinson J, Barker D, Marsh SGE,
   *25 years of the IPD-IMGT/HLA Database*, HLA (2024) 103(6):e15549; and Robinson J, Malik A,
   Parham P, Bodmer JG, Marsh SGE, *IMGT/HLA -- a sequence database for the human major
   histocompatibility complex*, Tissue Antigens (2000) 55:280--287.
-- For the 20 BoLA, SLA and Mamu rows the operative page is
-  [`ebi.ac.uk/ipd/licence/`](https://www.ebi.ac.uk/ipd/licence/), which says the same for IPD-MHC.
-- What this repository ships against that: `pipeline/preprocess/mhc_sequences/MHC2MSA.csv` is a
-  12,212-row **mirror** of the class II alignment, and `HLA2_IMGT.csv` and the three
-  `data/mhc_mapping/` tables are **modified versions** of it — gap characters stripped, four-field
-  names collapsed to two-field, sequences sliced to domain windows. Of the 154 published rows, 116
-  are IPD-IMGT/HLA and 20 are IPD-MHC (BoLA, SLA, Mamu).
-- **The release is 3.59.0** (2025-01-15). No artifact on disk records it, so it was recovered from
-  the distribution's own `Allelelist_history.txt` on 2026-09-13: of the 110 releases it covers,
-  **exactly one** contains all 12,212 allele names in `MHC2MSA.csv`. 3.58.0 is missing 187 of them
-  and 3.60.0 has renamed or deleted 14, so the fit is unique.
-- **No permission was requested and none has been granted.** Treat these six files as unresolved
-  rather than cleared. NoDerivs restricts *distributing* adaptations, not using them, so the
-  checkpoints, the training runs and every published number are unaffected. The two distributed
-  embedding stores — `demo/data/emb_hla_esmc_small_demo_fp16.h5` and
-  `daylight-00/prepibind-embeddings` — are a closer call, since their contents are per-residue
-  representations of these sequences; include them in the same request.
-- Cite in any case, in the form the licensor asks for at
-  [`ebi.ac.uk/ipd/imgt/hla/about/citations/`](https://www.ebi.ac.uk/ipd/imgt/hla/about/citations/)
-  ("For all citations please use"), read 2026-09-10:
-  Barker DJ, Natarajan RHL, Cooper MA, Hopper SJF, Yates AD, Marsh SGE, Robinson J.
-  *The IPD-IMGT/HLA Database: recent developments in sequence submission.*
-  Nucleic Acids Research (2026) 54:D1152–D1158.
-  (The licence page dates the same paper 2025 — advance access. The citations page is the operative
-  one, and both list seven authors.)
-  For IPD-MHC, [`ebi.ac.uk/ipd/licence/`](https://www.ebi.ac.uk/ipd/licence/) names Robinson J,
-  Maccari G, Marsh SGE, et al. *KIR Nomenclature in non-human species*, Immunogenetics (2018) — but
-  marks it "in preparation" and it does not resolve, so cite it as the licence page gives it and say
-  where it came from rather than implying it is a locatable reference.
+- **IPD-MHC** (the BoLA, SLA and Mamu rows) is covered by
+  [`ebi.ac.uk/ipd/licence/`](https://www.ebi.ac.uk/ipd/licence/), which states the same terms. It
+  names Robinson J, Maccari G, Marsh SGE, et al. *KIR Nomenclature in non-human species*,
+  Immunogenetics (2018); that reference is marked "in preparation" and does not resolve, so it is
+  given here as the licence page gives it.
+- **How the release was identified**, since no artifact of ours recorded it: of the 110 releases in
+  the distribution's `Allelelist_history.txt`, exactly one contains all 12,212 allele names in the
+  class II alignment this chain was built from. 3.58.0 is missing 187 of them and 3.60.0 has
+  renamed or deleted 14.
+- **Derived from the same sequences**, and therefore carrying the same attribution:
+  `demo/data/emb_hla_esmc_small_demo_fp16.h5` and the HuggingFace store
+  `daylight-00/prepibind-embeddings`, whose contents are per-residue representations of them.
 
 **UniProt — CC BY 4.0.** [`uniprot.org/help/license`](https://www.uniprot.org/help/license): "We
 have chosen to apply the Creative Commons Attribution 4.0 International (CC BY 4.0) License to all
