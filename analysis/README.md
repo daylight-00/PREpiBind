@@ -23,12 +23,16 @@ analysis/
 │       └── anal_pred_*.ipynb
 └── figures/
     ├── figio.py            shared loading / units / annotation for the figures
+    ├── fig1.{pdf,svg}      the workflow and architecture schematic. Drawn by hand, NOT produced
+    │                       by `make figures`; the editable source is
+    │                       fig1_workflow_and_architecture.fig
     ├── umap_cache/         the UMAP coordinates behind figS2, so it redraws without a GPU
     └── *.ipynb             figure notebooks, reading scoring/*/*_results.csv
 ```
 
 `make figures` and `make scoring` at the repository root drive both halves; the snapshot is only
-needed for the second.
+needed for the second. `make figures` regenerates fig2-fig5 and figS1-figS2; fig1 is a drawing and
+is shipped as a file.
 
 ## The snapshot mirrors the scratch path
 
