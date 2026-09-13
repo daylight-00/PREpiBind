@@ -72,8 +72,14 @@ not redistributed here", which was wrong — derived rows from it are shipped in
   `mhc_ligand_full_single_file.zip`, 251,184,299 bytes, sha256
   `7ce2af4d57a60c6a5f5fc474b5636fc6471479dd3f204170c3ef26760d6370dc`; its single member
   `mhc_ligand_full.csv` (7,745,252,872 bytes) carries the timestamp **2025-04-21 20:01:12** US/Pacific,
-  i.e. 2025-04-22 KST, and was downloaded 2025-04-24. **`pipeline/preprocess/paths.py` and
-  `pipeline/preprocess/README.md` say 2025-04-20; no artifact supports that date.**
+  i.e. 2025-04-22 KST, and was downloaded 2025-04-24. `pipeline/preprocess/paths.py` and
+  `pipeline/preprocess/README.md` said **2025-04-20** until 2026-09-13; no artifact supports that
+  date and both now name the stamped one.
+  **A second IEDB export is also used**, and only by `data/unique_epitope_whole.csv`: the T-cell
+  assay table `tcell_full_v3.zip`, 43,216,977 bytes, sha256
+  `09c87e9bed4f1d9d0fd594ccd674734ca3161d82d5b3cebeb28e85bbf39e86eb`, member `tcell_full_v3.csv`
+  (1,287,618,749 bytes) dated 2025-04-01, from the same April 2025 download. It carries the same CC
+  BY 4.0 terms. No dataset arm draws on it.
 - **Attribution owed, and how it is met.** Cite IEDB — Vita R, Blazeska N, Marrama D, et al. *The
   Immune Epitope Database (IEDB): 2024 update.* Nucleic Acids Res. 2025;53(D1):D436–D443,
   doi:10.1093/nar/gkae1092 — and `www.iedb.org`. Stage 1 drops the PMID and submission-ID columns, so
@@ -85,9 +91,17 @@ not redistributed here", which was wrong — derived rows from it are shipped in
   stage 1 — `pipeline/preprocess/notebooks/1_iedb_to_draft.ipynb` carries most of them into the
   (gitignored) `draft.csv`; they are discarded when each arm notebook builds a fresh frame from the
   columns it needs. Verified against the published headers, not against the stage that was assumed
-  to do it. Exactly two published columns are verbatim
-  IEDB values — `Epi_Seq` (`Epitope > Name`) and `HLA_Name_full` (`MHC Restriction > Name`). Every
-  other column is derived here. The 566 MB `draft.csv`, which does retain IEDB metadata columns, is
+  to do it. **Three published columns are verbatim IEDB values**, and at scale: `Epi_Seq`
+  (`Epitope > Name`), `HLA_Name_full` (`MHC Restriction > Name`), and `demo/data/dataset_demo.csv`'s
+  `Epitope`. Measured against the retained export, not sampled: 774,446 + 319,821 + 48,352 published
+  rows carry a byte-identical `Epitope > Name`, and 1,094,267 of them also carry a byte-identical
+  `MHC Restriction > Name`; all 161,252 distinct (epitope, allele) pairs published anywhere occur as
+  assay records in the export. `data/unique_epitope_whole.csv` is accounted for in full, but not from
+  one source: 58,134 of its 63,146 rows are a verbatim `Epitope > Name` in the MHC-ligand export,
+  3,498 come from the **IEDB T-cell assay export** named above, and the remaining 1,514 are generated
+  here — four complete saturation-mutagenesis scans (15 positions x 19 substitutions each) and
+  re-registered variants of published wild-types. Nothing in it is third-party data beyond IEDB.
+  Every other column is derived here. The 566 MB `draft.csv`, which does retain IEDB metadata columns, is
   `.gitignore`d and is not public.
 - **`data/` is CC BY 4.0, not MIT.** The repository's `LICENSE` is MIT and covers the code; it does
   not and cannot cover these rows, whose terms require attribution that MIT does not.
@@ -111,10 +125,18 @@ not redistributed here", which was wrong — derived rows from it are shipped in
   embedding stores — `demo/data/emb_hla_esmc_small_demo_fp16.h5` and
   `daylight-00/prepibind-embeddings` — are a closer call, since their contents are per-residue
   representations of these sequences; include them in the same request.
-- Cite in any case: Barker DJ, Natarajan RHL, Cooper MA, et al. *The IPD-IMGT/HLA Database: recent
-  developments in sequence submission.* Nucleic Acids Res. 2025;54:D1152–D1158; and Robinson J,
-  Maccari G, Marsh SGE, et al. *KIR Nomenclature in non-human species.* Immunogenetics (2018), which
-  is the citation the IPD licence page names.
+- Cite in any case, in the form the licensor asks for at
+  [`ebi.ac.uk/ipd/imgt/hla/about/citations/`](https://www.ebi.ac.uk/ipd/imgt/hla/about/citations/)
+  ("For all citations please use"), read 2026-09-10:
+  Barker DJ, Natarajan RHL, Cooper MA, Hopper SJF, Yates AD, Marsh SGE, Robinson J.
+  *The IPD-IMGT/HLA Database: recent developments in sequence submission.*
+  Nucleic Acids Research (2026) 54:D1152–D1158.
+  (The licence page dates the same paper 2025 — advance access. The citations page is the operative
+  one, and both list seven authors.)
+  For IPD-MHC, [`ebi.ac.uk/ipd/licence/`](https://www.ebi.ac.uk/ipd/licence/) names Robinson J,
+  Maccari G, Marsh SGE, et al. *KIR Nomenclature in non-human species*, Immunogenetics (2018) — but
+  marks it "in preparation" and it does not resolve, so cite it as the licence page gives it and say
+  where it came from rather than implying it is a locatable reference.
 
 **UniProt — CC BY 4.0.** [`uniprot.org/help/license`](https://www.uniprot.org/help/license): "We
 have chosen to apply the Creative Commons Attribution 4.0 International (CC BY 4.0) License to all

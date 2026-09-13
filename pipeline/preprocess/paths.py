@@ -5,7 +5,7 @@ paths were replaced by the names below, so that the chain runs from a checkout.
 
 Set the two external inputs before running:
 
-    PREPIBIND_IEDB_EXPORT   the unzipped IEDB Export v3 mhc_ligand_full.csv (7.7 GB, 2025-04-20)
+    PREPIBIND_IEDB_EXPORT   the unzipped IEDB Export v3 mhc_ligand_full.csv (7.7 GB, build of 2025-04-21)
     PREPIBIND_WORK          scratch for intermediates (default: preprocess/work)
 
 Everything else resolves inside the repository.

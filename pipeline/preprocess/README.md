@@ -42,7 +42,9 @@ their intermediate tables.
 
 `verify_outputs.py` checks 20 files: the sixteen `data/dataset/*/{train,test}{,_beta}.csv`, the
 three `data/mhc_mapping/` tables and `data/unique_epitope_whole.csv`. All twenty match when the
-chain is run from the 2025-04-20 export.
+chain is run from the 2025-04-21 export (the zip member of the retained
+`mhc_ligand_full_single_file.zip` is stamped 2025-04-21 20:01:12 US/Pacific; earlier revisions of
+this file said 2025-04-20, a date no artifact supports).
 
 Two files here are inputs rather than products:
 
