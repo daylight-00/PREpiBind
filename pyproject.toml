@@ -7,7 +7,8 @@
 #
 # Pinning policy: pin what a reproducibility claim rests on, give everything else a floor.
 # `torch` is pinned because the released checkpoints and the reported scores were produced with it.
-# Only genuinely conda-only components appear under [tool.pixi.dependencies].
+# [tool.pixi.dependencies] carries the conda-only components, plus the two below that have to be
+# constrained on the conda side because that is where pixi's solve fixes their versions.
 
 [build-system]
 requires = ["setuptools>=64"]
@@ -36,7 +37,7 @@ dependencies = [
     "h5py",
     "scikit-learn",
     "scipy",
-    "matplotlib",
+    "matplotlib<3.11",
     "seaborn",
     "tqdm",
     # `make figures`, `make scoring` and `make datasets` all execute notebooks.
@@ -81,6 +82,22 @@ extra-index-urls = ["https://download.pytorch.org/whl/cu126"]
 
 [tool.pixi.dependencies]
 python = "==3.13.2"
+# The committed figure PDFs were rendered with matplotlib 3.10.3, and the pin keeps the
+# rebuild comparable to them: on 3.10.3 all six are pixel-identical and five of six are
+# byte-identical once PDF metadata is stripped. 3.11 shifts sub-pixel layout and
+# tight-bbox rounding, and redraws figS2 with 538 vector objects instead of 555. Pinned
+# at the conda level because that is where pixi's solve fixes the version -- a constraint
+# in [project] dependencies alone loses to it and fails to resolve. The bound is repeated
+# there as matplotlib<3.11 so it also holds for the `pip install -e .` path in the README,
+# which never sees this table.
+matplotlib-base = "==3.10.3"
+# cairosvg loads libcairo through cairocffi at run time. It used to arrive transitively
+# with matplotlib 3.11; 3.10.3 does not depend on it, and without this line cairocffi
+# silently binds whatever libcairo the host has -- /usr/lib64/libcairo.so.2 here -- so the
+# failure is a wrong library rather than a missing one, and a machine without one fails
+# outright. Declared here because the package that needs it is a PyPI package, which
+# cannot pull a conda library itself.
+cairo = "*"
 
 # RAPIDS is conda-only. Needed just to recompute Supplementary Figure S2; the committed
 # analysis/figures/umap_cache/*.npz reproduce the panel without it.

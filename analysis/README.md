@@ -35,6 +35,18 @@ needed for the second. `make figures` regenerates fig2-fig5, figS1-figS2, Table 
 tests, plus `figures/supp_ref_tables.tex` and the `supp_ref_*.csv` behind D09; fig1 is a drawing and
 is shipped as a file.
 
+The rebuild is comparable to the committed PDFs, not merely equivalent. From the locked environment
+all six come out pixel-identical at 150 dpi; the five matplotlib ones are byte-identical once
+`/CreationDate`, `/ModDate`, `/ID` and `/Producer` are stripped, and figS1, which cairosvg writes,
+is byte-identical in every object except the one holding its own `/CreationDate` — cairo packs that
+into a compressed object stream, so stripping the plain-text keys does not reach it. The page
+content is unchanged.
+
+This is why `pyproject.toml` pins matplotlib: a different minor version redraws the same figures
+with different sub-pixel layout and tight-bbox rounding, and gives figS2 538 vector objects instead
+of 555. The `.svg` companions are a different matter — they carry a generation timestamp that
+nothing strips, so `make figures` always leaves them modified in `git status`.
+
 `make scoring` aborts unless `PREPIBIND_RAW_ROOT` points at the unpacked snapshot; `rawpath` falls
 back to `IMG_RAW_ROOT`, then to `0_raw/` beside it. The snapshot is in no clone and is not yet
 downloadable: the archival deposit that will carry it is staged but has no host and no DOI, see
