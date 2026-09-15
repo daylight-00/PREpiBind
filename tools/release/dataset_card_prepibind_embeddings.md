@@ -161,4 +161,4 @@ cite them as those databases ask.
 }
 ```
 
-Cite ESMC as EvolutionaryScale asks, as well: these embeddings are its output.
+Cite ESMC as Chan Zuckerberg Biohub asks, as well: these embeddings are its output.
