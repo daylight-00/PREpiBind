@@ -11,8 +11,8 @@ representations. It encodes epitopes on the fly with
 [ESMC 300M](https://huggingface.co/daylight-00/esmc-300m-2024-12) and reads pre-computed HLA
 embeddings for the alpha and beta chains, feeding both into a lightweight cross-attention head.
 
-This repository is both the released model and the paper's artifact: every dataset, figure and table
-can be rebuilt from what is here. See [Reproducing the paper](#reproducing-the-paper).
+This repository is both the released model and the paper's artifact: every dataset, table and
+quantitative figure can be rebuilt from what is here. See [Reproducing the paper](#reproducing-the-paper).
 
 ---
 
@@ -47,8 +47,7 @@ python -m prepibind.inference configs/predict/config_demo.py --plot
 ```
 
 Predictions land in `outputs/prediction.csv`, alongside `plot.png` with `--plot`. Pass a different
-config to select a model; every config key can be overridden on the command line, and `--help`
-lists them.
+config to select a model; `--help` lists the ten config keys that have command-line flags.
 
 Weights are fetched by the notebooks; to get them directly:
 
@@ -151,8 +150,9 @@ configs/train/        one config per representation (11), plus config_global.jso
 configs/predict/      the four released models
 data/                 the four dataset arms, the HLA mapping tables, the epitope key list
 pipeline/preprocess/  IEDB export -> the four arms, as notebooks             (README)
-pipeline/embeddings/  one directory per backend: ESMC, ESM3, Chai-1, Boltz, AF3  (README)
-analysis/scoring/     raw predictions -> the *_results.csv the figures read   (README)
+pipeline/embeddings/  four environments: esm/ (ESMC and ESM3), chai/, boltz/, af3/  (README)
+analysis/             the prediction snapshot, rawpath, raw_manifest.csv   (README)
+analysis/scoring/     raw predictions -> the *_results.csv the figures read
 analysis/figures/     the figures and tables in the paper
 models/               downloaded checkpoints (git-ignored)
 supplementary_data/   the machine-readable D01-D12 tables                     (README)
@@ -162,7 +162,8 @@ demo/                 the notebooks in Quick Start
 ## Reproducing the paper
 
 ```bash
-make figures        # every figure and table, from this repository alone. No GPU, no snapshot
+make figures        # fig2-fig5, figS1-figS2, every table. This repository alone, no GPU, no snapshot
+make mhc-alignment  # fetch the IPD-IMGT/HLA alignment (not shipped); make datasets needs it
 make datasets       # the four arms, from the IEDB export       (needs PREPIBIND_IEDB_EXPORT)
 make supplementary  # the D01-D12 tables
 make verify         # checksums for the datasets and the D tables   (needs PREPIBIND_EMB_ROOT)
@@ -170,7 +171,9 @@ make scoring        # the scoring tables, from the raw predictions  (needs PREPI
 ```
 
 `make figures` is the tier that matters for reading the paper: the scoring outputs are tracked, so
-the figure notebooks read them directly. It takes about a minute.
+the figure notebooks read them directly. It takes about a minute. Figure 1 is not in it: it is a
+hand-drawn schematic, edited as `analysis/figures/fig1_workflow_and_architecture.fig` and shipped as
+`fig1.{pdf,svg}`.
 
 The three variables have no defaults, because the files they point at are in no fresh clone:
 `PREPIBIND_RAW_ROOT` is the unpacked 1.2 GB prediction snapshot (`analysis/README.md`),
@@ -180,8 +183,8 @@ The three variables have no defaults, because the files they point at are in no 
 `make verify`, `make demo-assets` and nine of the eleven training configs all read.
 
 Not reproducible from this repository alone: training runs and embedding generation, which need GPUs
-and one environment per backend (`pipeline/embeddings/*/pixi.lock`). The code is here; the inputs and
-outputs are not. Training is also not bit-reproducible across GPU models.
+and four environments (`pipeline/embeddings/*/pixi.lock`). The code is here; the inputs and outputs
+are not. Training is also not bit-reproducible across GPU models.
 
 ## Requirements
 

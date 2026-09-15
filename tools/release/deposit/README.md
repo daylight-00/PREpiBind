@@ -27,7 +27,7 @@ Three files, 545.3 MiB, all verified on 2026-09-10 — full checksums in `invent
 |---|---:|---|
 | `0_raw_260910.tar.zst` | 308,022,032 | the prediction snapshot, 12,035 files, 1.16 GiB unpacked. `PREPIBIND_RAW_ROOT`, consumed by `make scoring` |
 | `mhc_ligand_full_single_file.zip` | 251,184,299 | the IEDB export of 2025-04-21. `PREPIBIND_IEDB_EXPORT` after unzipping, consumed by `make datasets` stage 1 |
-| `draft.csv.tar.zst` | 12,605,261 | the stage-0 intermediate, so a downloader can skip the 7.7 GB stage 1 |
+| `draft.csv.tar.zst` | 12,605,261 | the stage-1 intermediate, so a downloader can skip the 7.7 GB stage 1 |
 
 ## What it does not cover
 

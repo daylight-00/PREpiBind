@@ -47,9 +47,10 @@ fifteen — the one with the lowest validation loss, the value in the table abov
 quantity took part in the choice. For a benchmark comparison, use the paper's means, not one
 checkpoint.
 
-Quote the validation losses from `analysis/val_metrics.csv` in the repository. The `val_loss` and
-`val_auc` columns of `analysis/scoring/*/per_run_results.csv` are not usable for this: the first
-predates a parser fix, and the second comes from a `roc_auc_score` call with its arguments swapped.
+Quote the validation losses from `analysis/val_metrics.csv` in the repository; the `val_loss`
+column of `analysis/scoring/*/per_run_results.csv` is joined in from that file and carries the same
+numbers. The `val_auc` column in either is not usable: it comes from a `roc_auc_score` call with its
+arguments swapped.
 
 Held-out test sets, never used for selection: 48,352 rows (qualitative), 33,490 (ms), 14,150 (both
 IC50 arms).
@@ -66,12 +67,9 @@ From the IEDB Export v3, split into arms by measurement type. The rebuild is
 | ic50_500 | `data/dataset/ic50/` | 33,004 | 14,150 | `Target_500` | 36.7 % |
 | ic50_1000 | `data/dataset/ic50/` | 33,004 | 14,150 | `Target_1000` | 46.0 % |
 
-The qualitative arm's training config names `dataset/full_bal/`, a directory since renamed to
-`full`. Same CSVs.
-
 Training: AdamW, lr 1e-5, betas (0.9, 0.999), eps 1e-8, weight decay 0.01, five-fold CV, best epoch
-by validation loss (20, 27, 28, 28 for the four files above — the epoch each file stores, and the
-corrected argmin of its run). Both sides were fed from precomputed
+by validation loss (20, 27, 28, 28 for the four files above — the epoch each source checkpoint
+recorded, and the corrected argmin of its run). Both sides were fed from precomputed
 ESMC 300M embeddings, `emb_hla_esmc_small_0430.h5` for the HLA chains and the matching epitope
 store.
 
@@ -118,15 +116,15 @@ Two limits worth knowing before feeding it anything:
 
 ```bash
 git clone https://github.com/daylight-00/PREpiBind && cd PREpiBind
-pip install --extra-index-url https://download.pytorch.org/whl/cu126 -e .
+pip install --extra-index-url https://download.pytorch.org/whl/cu126 -e ".[demo]"
 
 hf download daylight-00/prepibind           prepibind_qualitative_s100_f0.pt --local-dir models
 hf download daylight-00/esmc-300m-2024-12   esmc_300m_2024_12_v0_fp16.pth    --local-dir models
 hf download daylight-00/prepibind-embeddings emb_hla_esmc_small_0430.h5 --repo-type dataset --local-dir emb
 ```
 
-The ESMC encoder is vendored into the package (`prepibind/esmc/`), so `torch` and
-`huggingface_hub` are the only runtime dependencies for inference — no `pip install esm`.
+The ESMC encoder is vendored into the package (`prepibind/esmc/`) and runs on `torch` alone, so
+inference needs no `pip install esm`.
 
 ```python
 from prepibind.inference import load_config, main
@@ -155,8 +153,9 @@ The CLI does the same thing for the configs' own settings:
 python -m prepibind.inference configs/predict/config_ms.py --chkp_path models/prepibind_ms_s128_f3.pt --plot
 ```
 
-No GPU is required. Without CUDA, or on a pre-Ampere card, the runtime turns off flash-attn, falls
-back to float32 and says so.
+No GPU is required, and the runtime says whatever it had to drop: without CUDA, float32 throughout
+and no flash-attn; on a pre-Ampere card, flash-attn off and the bfloat16 ESMC demoted to float16,
+head unchanged.
 
 ## Limitations and known caveats
 

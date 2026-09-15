@@ -4,19 +4,20 @@ Machine-readable versions of the numbers behind the paper. The manuscript prints
 the per-allele and per-molecule values those means are taken over, the per-seed spread, the
 statistics, and the key that maps internal model identifiers to the names used in the text.
 
-Nothing here is recomputed. Every file is a re-packaging of `analysis/scoring/*`, produced by
+Nothing here is recomputed. Every file is a re-packaging of `analysis/scoring/*`, or of
+`analysis/figures/*` for D09 and D12, produced by
 
     python supplementary_data/build_supplementary_data.py            # write
     python supplementary_data/build_supplementary_data.py --check    # regenerate and diff
 
 Numbered `D01..D12`, not `S1..`, because the manuscript owns the Supplementary Table numbering
-S1-S19. Those tables are typeset in the supplementary PDF; these are data files.
+S1-S20. Those tables are typeset in the supplementary PDF; these are data files.
 
 | file | rows | what it is | where the paper uses it |
 |---|---:|---|---|
 | `D01_pooled_benchmark` | 59 | Pooled performance of every method on Qualitative, MS, both IC50 thresholds and H2-out: all five metrics with seed-level SD | Table 2, Figure 2 |
-| `D02_seed_level_benchmark` | 159 | The three per-seed values behind every mean in D01, each already averaged over its five folds | the `± SD` in Table 2 |
-| `D03_per_allele_qualitative` | 395 | Per-allele ROC-AUC on the Qualitative test set, 106 alleles x 7 methods, with per-allele positive and negative counts | Figure 3a shows the distribution; the text quotes only the mean over the 57 shared alleles |
+| `D02_seed_level_benchmark` | 147 | The three per-seed values behind every retrained method's mean in D01, each already averaged over its five folds. The two published tools have no seeds and are absent; both IC50 thresholds carry the evaluation label `IC50` and are told apart by `dir` | the `± SD` in Table 2 |
+| `D03_per_allele_qualitative` | 395 | Per-allele ROC-AUC on the Qualitative test set, with per-allele positive and negative counts. 58 allele-pair names x 6 methods, less H2-IAg7 for NetMHCIIpan-4.3, plus DeepNeo's 48 beta-chain names = 395 | Figure 3a shows the distribution; the text quotes only the mean over the 57 shared alleles |
 | `D04_per_allele_ms` | 286 | The same for the MS test set | **not in the paper** |
 | `D05_per_molecule_lomo` | 396 | Leave-one-molecule-out, per withheld molecule, all five metrics | Figure 3b shows the distribution; the text quotes means |
 | `D06_per_molecule_h2_out` | 55 | H2-out per murine molecule. 8 molecules x 7 methods = 55, not 56: NetMHCIIpan-4.3 has no H2-IAg7 pseudosequence | Figure 3d, Supplementary 1.6 |
@@ -42,9 +43,11 @@ Shared across the performance tables:
 | `HLA_Type` | serotype: HLA-DP, HLA-DQ, HLA-DR or H2 |
 | `pos_count`, `neg_count` | class counts for that allele or molecule |
 | `evaluation`, `dataset`, `serotype`, `stratum` | which slice the row belongs to |
+| `dir` | the scoring run's prediction directory. `D02` only, where it separates the two IC50 thresholds, `plots_500` and `plots_1000`; blank where the scoring table carries no `dir` |
 
-`D09`: `a` and `b` are the two methods, `median_delta` is the median paired difference `a - b`,
-`p` is raw and `p_adj` is Holm-corrected within the panel, `sig` is the conventional star notation.
+`D09`: `unit` is the pairing unit (`allele pair`, `beta chain`, `beta chain, LOMO`), `a` and `b`
+are the two methods, `median_delta` is the median paired difference `a - b`, `p` is raw and `p_adj`
+is Holm-corrected within the panel, `sig` is the conventional star notation.
 
 `D10`: `kind` is `marginal` for a single method's interval and a comparison otherwise; `value` is
 the point estimate and `lo`/`hi` the 95% bounds from 1,000 resamples of the test set, recomputing

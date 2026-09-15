@@ -44,24 +44,26 @@ flowchart TD
 ```
 
 ## How to run
-- Set the configuration in the `config.py` file.
-    - For default, `config.py`' imports the `model.py` and `encoder.py` files located in the `code` directory.'
-    - You can import your own `model.py` and `encoder.py` files just simply locating them in your working directory, or chainging the import path in the `config.py` file.
-- You can run the code by running the `run.ipynb` or `run.sh` file.
-    - If you want to run the code in the terminal, you can run the `run.sh` file by typing `bash run.sh` in the terminal.
-    - If you want to run the code in the jupyter notebook, you can run the `run.ipynb` file by running the cells in the jupyter notebook.
-    - You can also run the code in the terminal by running train.py file.
+- Pick a config. Each `config_*.py` imports `prepibind.model` and `prepibind.encoder`; change those
+  two imports to use your own.
+- The embedding stores are not distributed with the repository: set `PREPIBIND_EMB_ROOT` to the
+  directory holding the `emb_*.h5` files, or see `pipeline/embeddings/`.
+- `run.sh` trains and then evaluates, one config or several in sequence.
 ```bash
-# Run the code in the terminal
-python $CODE_PATH/train.py $CONFIG_PATH
+configs/train/run.sh configs/train/config_esmc_small.py    # one
+configs/train/run.sh configs/train/config_*.py             # all eleven
+
+# the two steps run.sh runs per config
+python -m prepibind.train configs/train/config_esmc_small.py
+python -m prepibind.test  configs/train/config_esmc_small.py
 ```
 ```python
-# Run the code in the jupyter notebook
-from prepibind.train import main as train
-train('Path of the config file')
+# from a notebook; main takes the loaded config, not a path
+from prepibind.train import load_config, main as train
+train(load_config('configs/train/config_esmc_small.py'))
 ```
 
-### Description of Selected Arguments in `config.py`
+### Description of Selected Arguments in `config_*.py`
 | Arguemnt | Description |
 | --- | --- |
 | model | Select specific class in `model.py` |

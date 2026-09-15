@@ -17,7 +17,7 @@ rebuild the four datasets from the source database export.
 |---|---:|---|
 | `0_raw_260910.tar.zst` | 294 MiB | prediction snapshot: every model output the paper's numbers are computed from |
 | `mhc_ligand_full_single_file.zip` | 240 MiB | the IEDB Export v3 the datasets were built from, exactly as IEDB served it |
-| `draft.csv.tar.zst` | 12 MiB | the stage-0 intermediate, so you can skip the 7.7 GB step |
+| `draft.csv.tar.zst` | 12 MiB | the stage-1 intermediate, so you can skip the 7.7 GB step |
 | `SHA256SUMS` | | checksums for the three files above |
 
 ## Verify first
@@ -92,6 +92,7 @@ sha256 of the member  4d6d451023dbf93f3be6c4d44880147d2f0d294901776fa6f1df43f7c2
 ```bash
 unzip mhc_ligand_full_single_file.zip          # -> mhc_ligand_full.csv, 7.7 GB
 export PREPIBIND_IEDB_EXPORT=$PWD/mhc_ligand_full.csv
+make mhc-alignment                             # the IPD-IMGT/HLA alignment, fetched, not shipped
 make datasets
 python pipeline/preprocess/verify_outputs.py   # 20/20 md5 matches
 ```
@@ -104,7 +105,7 @@ IEDB owns this data. It is redistributed here only so the exact snapshot behind 
 datasets stays retrievable; the live database has moved on since. Cite IEDB, not us, for the
 underlying measurements.
 
-## 3. `draft.csv.tar.zst` — the stage-0 intermediate
+## 3. `draft.csv.tar.zst` — the stage-1 intermediate
 
 `draft.csv` is what stage 1 produces from the export: MHC class II rows, linear peptides, no
 mutants. 566,494,795 bytes, 1,752,305 lines. Unpacking it lets you rebuild the four dataset arms
@@ -112,6 +113,7 @@ without ever downloading or loading the 7.7 GB export.
 
 ```bash
 tar -I zstd -xf draft.csv.tar.zst -C pipeline/preprocess/work/   # -> work/draft.csv
+python pipeline/preprocess/fetch_mhc_alignment.py                # the IPD-IMGT/HLA alignment, fetched, not shipped
 python pipeline/preprocess/run_all.py --only 0                   # HLA sequences and windows
 python pipeline/preprocess/run_all.py --from 2                   # the four arms
 python pipeline/preprocess/verify_outputs.py                     # 20/20
@@ -130,7 +132,7 @@ downloads. No column the four arms keep is affected, and the twenty output check
 |---|---|---|
 | model checkpoints | HuggingFace `daylight-00/prepibind` (float32) and `daylight-00/prepibind-demo` (float16) | inference on new peptides |
 | the research HLA embedding store `emb_hla_esmc_small_0430.h5` | HuggingFace `daylight-00/prepibind-embeddings` | `make demo-assets`, and the last step of `make verify` |
-| ESMC 300M encoder weights | HuggingFace `daylight-00/esmc-300m-2024-12`, EvolutionaryScale Cambrian Open License | encoding epitopes at run time |
+| ESMC 300M encoder weights | HuggingFace `daylight-00/esmc-300m-2024-12`, MIT | encoding epitopes at run time |
 | the epitope embedding stores, about 21 GB | **not published** | re-scoring from checkpoints, and retraining |
 | NetMHCIIpan-4.3 and MixMHC2pred-2.0 | their own distributors, under their own licences | re-running the two reference tools. Their predictions are already in the snapshot at `0_raw/260830/ref/`, and the tables derived from them are in the repository |
 | the figures' own inputs | in the repository | nothing. `make figures` needs no download |

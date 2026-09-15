@@ -91,7 +91,7 @@ All files were verified on 2026-09-10.
    member timestamp 2025-04-22 12:01, member sha256
    `4d6d451023dbf93f3be6c4d44880147d2f0d294901776fa6f1df43f7c284ba52`. Consumed by `make datasets`
    through `PREPIBIND_IEDB_EXPORT`.
-3. **`draft.csv.tar.zst`** — stage-0 intermediate `draft.csv`, 566,494,795 bytes, 1,752,305 lines:
+3. **`draft.csv.tar.zst`** — stage-1 intermediate `draft.csv`, 566,494,795 bytes, 1,752,305 lines:
    class II rows, linear peptides, mutants removed. Lets stages 2-5 run without the export.
 
 ---

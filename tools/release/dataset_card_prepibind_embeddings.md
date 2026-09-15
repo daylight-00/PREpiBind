@@ -55,11 +55,11 @@ curation and are used by analyses of molecule coverage, not by any released chec
 
 ## How it was produced
 
-ESMC 300M forward pass over each chain's full amino-acid sequence, per-residue hidden states
-kept, `[CLS]` and `[EOS]` stripped, written as float32. The code is `pipeline/embeddings/esmc/` in
-the repository; the sequences come from `data/mhc_mapping/`, which derives from IPD-IMGT/HLA and
-UniProt. Nothing here is a measurement — it is a deterministic function of the sequences and the
-backbone weights.
+ESMC 300M forward pass over each chain's full amino-acid sequence, per-residue hidden states kept,
+`[CLS]` and `[EOS]` stripped, written as float32. The code is
+`pipeline/embeddings/esm/esm_local_esmc_300m.py` in the repository; the sequences come from
+`data/mhc_mapping/`, which derives from IPD-IMGT/HLA and UniProt. Nothing here is a measurement — it
+is a deterministic function of the sequences and the backbone weights.
 
 The peptide-binding window is **not** applied in this file. It is carried separately, in
 `data/mhc_mapping/HLA2_IMGT_MSA_idx_edit.csv`, as `sequence|start|end`, and applied at load time.
@@ -80,8 +80,8 @@ released checkpoints were trained on:
 
 `H2-IAdA` and `H2-IAdB` had been written from each other's sequences. The governing decision is
 *disclose, do not retro-apply*: re-running finished training on account of them would buy nothing at
-the scale involved. The May 2025 training runs behind the released checkpoints read the **pre-fix**
-arrays.
+the scale involved. The training runs behind the released checkpoints all predate the fix and read
+the **pre-fix** arrays.
 
 The scale, measured on the arms rather than asserted — rows whose alpha or beta chain is one of the
 three changed keys:
@@ -136,8 +136,8 @@ The demo's 116-allele float16 store is derived from this file, and the derivatio
 PREPIBIND_EMB_ROOT=$(pwd)/emb python demo/build_demo_assets.py hla-store --check
 ```
 
-`PREPIBIND_EMB_ROOT` is the directory you downloaded this file into. The script's built-in default
-path predates a repository move and no longer exists, so set the variable.
+`PREPIBIND_EMB_ROOT` is the directory you downloaded this file into. The script has no default: the
+store is in no fresh clone, so set the variable.
 
 ## Licence
 

@@ -11,7 +11,7 @@ and last, CC BY-NoDerivs for the two IPD databases. Per-file terms: [`data/LICEN
 
 | What | Where | Terms |
 |---|---|---|
-| HLA sequences cut to their peptide-binding domains | `data/mhc_mapping/`, `demo/data/mhc_mapping_demo.csv`, one member of `analysis/figures/data/figure_inputs.tar.zst` | IPD-IMGT/HLA release 3.59.0 (human) and IPD-MHC (BoLA, SLA, Mamu), both **CC BY-NoDerivs**, citations below. The alignment itself is **not** redistributed: `pipeline/preprocess/fetch_mhc_alignment.py` downloads it. |
+| HLA chain sequences, full-length and gap-free, with the peptide-binding window carried alongside as coordinates. Only the demo table ships cut to that window | `data/mhc_mapping/`, `demo/data/mhc_mapping_demo.csv`, one member of `analysis/figures/data/figure_inputs.tar.zst` | IPD-IMGT/HLA release 3.59.0 (human) and IPD-MHC (BoLA, SLA, Mamu), both **CC BY-NoDerivs**, citations below. The alignment itself is **not** redistributed: `pipeline/preprocess/fetch_mhc_alignment.py` downloads it. |
 | H2 (murine) chains, 18 rows of the same tables | `data/mhc_mapping/` | UniProt, **CC BY 4.0** |
 | Epitope–allele rows derived from IEDB: 774,446 in `data/dataset/`, plus the epitope key list, the demo input and three tables inside the figure tarball | `data/dataset/`, `data/unique_epitope_whole.csv`, `demo/data/dataset_demo.csv`, `analysis/figures/data/figure_inputs.tar.zst` | **CC BY 4.0**. Modified IEDB data — filtered, relabelled, re-split |
 | ESMC encoder source, vendored from `esm` 3.4.0 and modified as each file's header records | `prepibind/esmc/`, licence at `prepibind/esmc/LICENSE-esm.md` | **MIT**, but "Copyright 2026 Chan Zuckerberg Biohub, Inc." — which is why the licence travels with the directory. `rotary.py` also carries EleutherAI/HuggingFace's Apache-2.0 header from upstream |
@@ -69,9 +69,10 @@ paper do.
   [`github.com/ANHIG/IMGTHLA`](https://github.com/ANHIG/IMGTHLA), **release 3.59.0** (2025-01-15).
   Its `LICENCE.md` governs them: CC BY-NoDerivs, and it asks that the data be linked to rather than
   mirrored. The alignment is therefore fetched, not shipped
-  (`pipeline/preprocess/fetch_mhc_alignment.py`). What ships is 154 rows of gap-free sequence cut to
-  the peptide-binding domain — 116 HLA, 18 H2 from UniProt, 20 BoLA/SLA/Mamu from IPD-MHC — under
-  window coordinates and collapse decisions that are ours (`mhc_sequences/`).
+  (`pipeline/preprocess/fetch_mhc_alignment.py`). What ships is 154 rows of gap-free chain
+  sequence — 116 HLA, 18 H2 from UniProt, 20 BoLA/SLA/Mamu from IPD-MHC — uncut, with the
+  peptide-binding window carried beside each row as coordinates; those window and collapse decisions
+  are ours (`mhc_sequences/`). The cut is applied only in `demo/data/mhc_mapping_demo.csv`.
 - **Citations, as `LICENCE.md` asks.** All three are cited in the paper: Barker DJ, Natarajan RHL,
   Cooper MA, Hopper SJF, Yates AD, Parham P, Marsh SGE, Robinson J, *The IPD-IMGT/HLA Database:
   recent developments in sequence submission*, Nucleic Acids Research (2026) 54(D1):D1152–D1158,

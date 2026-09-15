@@ -31,8 +31,14 @@ analysis/
 ```
 
 `make figures` and `make scoring` at the repository root drive both halves; the snapshot is only
-needed for the second. `make figures` regenerates fig2-fig5 and figS1-figS2; fig1 is a drawing and
+needed for the second. `make figures` regenerates fig2-fig5, figS1-figS2, Table 2 and the paired
+tests, plus `figures/supp_ref_tables.tex` and the `supp_ref_*.csv` behind D09; fig1 is a drawing and
 is shipped as a file.
+
+`make scoring` aborts unless `PREPIBIND_RAW_ROOT` points at the unpacked snapshot; `rawpath` falls
+back to `IMG_RAW_ROOT`, then to `0_raw/` beside it. The snapshot is in no clone and is not yet
+downloadable: the archival deposit that will carry it is staged but has no host and no DOI, see
+`tools/release/deposit/README.md`.
 
 ## The snapshot mirrors the scratch path
 
@@ -46,8 +52,7 @@ So a file's provenance *is* its path: `rp.source(rel)` is `SCRATCH / rel`, and
 
 Mirroring rather than flattening is deliberate: directories that share seed names at different
 scratch roots overwrite each other under a flattened layout, silently dropping files no one
-notices. Three `hum_ani_full.csv` are marked `lost` in the manifest — they were produced on a
-workstation that no longer holds them; `sync_snapshot.py` reserves their paths.
+notices.
 
 ## Reading data
 
@@ -66,13 +71,13 @@ rp.table(root='250513/2_lomo')     # manifest slice as a DataFrame
 rp.status()                        # what is visible on this cluster
 ```
 
-`raw_manifest.csv` also records what is deliberately *not* in the snapshot:
+`raw_manifest.csv` gives every file a state:
 
 | state | meaning |
 | --- | --- |
 | `snapshot` | the file is in `0_raw/` |
 | `external` | too large to ship (the four HLA embedding `.h5`, 1.3 GB total). `figures/figS2_umap.py` reproduces its figure from `figures/umap_cache/*.npz` instead. |
-| `lost` | the original is gone. Three `hum_ani_full.csv` files referenced by `figures/` were deleted from scratch before this index existed; they were recovered and now ship in `figures/data/figure_inputs.tar.zst`. |
+| `bundled` | small enough to ship with the repository. The three `hum_ani_full.csv` that `figures/figS1_dataset_overlap.ipynb` reads are in `figures/data/figure_inputs.tar.zst`, so `rp.at()` resolves them and the figure layer needs no snapshot. |
 
 ## Running an analysis
 
@@ -89,7 +94,9 @@ per_run, seed_level, rep_level = pl.run(CONFIG)
 `config.py` declares only what differs: which scratch roots to read, which
 directories within them (`dir_filter`), which test set each row is scored against
 (`test_for`), which label column (`target_for`), which learning rate the models are
-pinned to (`lr_filter`), and any externally published baseline rows (`extra_rows`).
+pinned to (`lr_filter`), and whether the published tools are scored beside the
+representations (`ref=True`: `pipeline.ref_level()` scores NetMHCIIpan-4.3 and
+MixMHC2pred-2.0 from `0_raw/260830/ref/` on this analysis's own test set).
 
 One implementation, not seven copies: the notebooks differ only in their `config.py`.
 
@@ -151,7 +158,7 @@ is what makes the five methods commensurable - the beta is the only unit all of 
 have. Everything downstream is then a fully paired Wilcoxon signed-rank test,
 Holm-corrected across the pairs in a panel.
 
-`figures/tab2_pooled_benchmark.ipynb` reports the collapse alongside two alternatives — the full
+`figures/paired_tests.ipynb` reports the collapse alongside two alternatives — the full
 47 pairs without DeepNeo, and the 32 betas with exactly one pairing — and all three agree on every
 conclusion.
 
@@ -167,7 +174,7 @@ conclusion.
 ## Moving the snapshot between machines
 
 ```bash
-tools/snapshot.sh pack                # -> 0_raw.tar.zst  (~273 MB)
+tools/snapshot.sh pack                # -> 0_raw.tar.zst  (~308 MB)
 # copy it across, then on the other cluster:
 tools/snapshot.sh unpack 0_raw.tar.zst
 tools/snapshot.sh verify              # md5 every file against the manifest
