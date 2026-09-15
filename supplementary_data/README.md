@@ -22,7 +22,7 @@ S1-S19. Those tables are typeset in the supplementary PDF; these are data files.
 | `D06_per_molecule_h2_out` | 55 | H2-out per murine molecule. 8 molecules x 7 methods = 55, not 56: NetMHCIIpan-4.3 has no H2-IAg7 pseudosequence | Figure 3d, Supplementary 1.6 |
 | `D07_per_serotype` | 80 | Serotype-level performance (HLA-DP, -DQ, -DR, murine H2) on Qualitative and MS | Figure 4, Supplementary 1.6 |
 | `D08_stratified_9mer_overlap` | 65 | Qualitative performance stratified by 9-mer overlap with the training epitopes | Supplementary Table S3 |
-| `D09_paired_wilcoxon` | 36 | Holm-corrected paired Wilcoxon at both units: the shared allele pair and the beta chain | Supplementary Tables S18, S19 |
+| `D09_paired_wilcoxon` | 46 | Holm-corrected paired Wilcoxon at three units: the shared allele pair, the beta chain, and the beta chain under LOMO | Supplementary Tables S18, S19, S20 |
 | `D10_bootstrap_ci` | 11 | Bootstrap 95% CIs on pooled Qualitative ROC-AUC, marginal and paired | Supplementary Table S11 |
 | `D11_reference_tool_allele_map` | 149 | Allele-name mapping and support status for NetMHCIIpan-4.3 and MixMHC2pred-2.0 | Supplementary Text 1.9 |
 | `D12_method_key` | 13 | Internal model key, display name, representation family, pinned learning rate, parameter count | — |

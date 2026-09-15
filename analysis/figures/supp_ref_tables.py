@@ -7,6 +7,7 @@ Writes, next to this file:
     supp_ref_molecule.csv per-molecule summary, every method x every panel
     supp_ref_pairs.csv    all 21 Holm-corrected paired Wilcoxon tests for Per Molecule
     supp_ref_pairs_beta.csv  the same 21 pairs on the beta chain, incl. DeepNeo
+    supp_ref_pairs_lomo.csv  the 10 LOMO pairs on the beta chain (Figure 3b)
 
 The published tools were trained on data that overlap this benchmark. Their scores
 are therefore retained as contextual references rather than treated as independent
@@ -106,6 +107,18 @@ def pairs_beta() -> pd.DataFrame:
     return res[['a', 'b', 'n', 'median_delta', 'p', 'p_adj', 'sig']]
 
 
+def pairs_lomo() -> pd.DataFrame:
+    """Paired tests behind the LOMO panel, at the beta-chain unit.
+
+    The published tools are excluded rather than kept as references: nothing was
+    withheld from them, so they have no leave-one-molecule-out value to pair.
+    """
+    b = fx.by_beta(fx.lomo())
+    order = list(b['full_name'].drop_duplicates())
+    res = fx.paired_test(b, unit='beta', value='roc_auc', models=order)
+    return res[['a', 'b', 'n', 'median_delta', 'p', 'p_adj', 'sig']]
+
+
 def _tex(df: pd.DataFrame, caption: str, label: str, fmt: dict) -> str:
     cols = 'l' + 'r' * len(df.columns)
     head = ' & '.join([''] + [f'\\textbf{{{c}}}' for c in df.columns]) + ' \\\\'
@@ -125,11 +138,13 @@ def _tex(df: pd.DataFrame, caption: str, label: str, fmt: dict) -> str:
 
 def main() -> None:
     p, c, m, w, wb = pooled(), conventions(), molecule(), pairs(), pairs_beta()
+    wl = pairs_lomo()
     p.to_csv(f'{HERE}/supp_ref_pooled.csv')
     c.to_csv(f'{HERE}/supp_ref_convention.csv')
     m.to_csv(f'{HERE}/supp_ref_molecule.csv')
     w.to_csv(f'{HERE}/supp_ref_pairs.csv', index=False)
     wb.to_csv(f'{HERE}/supp_ref_pairs_beta.csv', index=False)
+    wl.to_csv(f'{HERE}/supp_ref_pairs_lomo.csv', index=False)
 
     tex = [
         _tex(
@@ -231,7 +246,7 @@ def main() -> None:
     print(c.round(4).to_string())
     print()
     print(m.round(3).to_string())
-    print(f'\nwrote supp_ref_tables.tex and three CSVs '
+    print(f'\nwrote supp_ref_tables.tex and four CSVs '
           f'({len(w)} pairs, {w.sig.ne("ns").sum()} significant)')
 
 

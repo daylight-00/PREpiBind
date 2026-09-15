@@ -105,9 +105,10 @@ def build():
     d = named(rep("8_strat"))
     out["D08_stratified_9mer_overlap"] = d.drop(columns=[c for c in ("lr",) if c in d.columns])
 
-    # D09  Holm-corrected paired Wilcoxon, both units
+    # D09  Holm-corrected paired Wilcoxon, all three units
     frames = []
-    for unit, f in [("allele pair", "supp_ref_pairs.csv"), ("beta chain", "supp_ref_pairs_beta.csv")]:
+    for unit, f in [("allele pair", "supp_ref_pairs.csv"), ("beta chain", "supp_ref_pairs_beta.csv"),
+                    ("beta chain, LOMO", "supp_ref_pairs_lomo.csv")]:
         d = pd.read_csv(os.path.join(FIGURES, f))
         d.insert(0, "unit", unit)
         frames.append(d)
