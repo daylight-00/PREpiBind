@@ -6,17 +6,22 @@
 \small
 \caption{Pooled ROC-AUC and effective sample sizes for all representations and the two published tools. The tools are scored only on supported alleles and were not retrained on our splits, so their values are contextual rather than like-for-like. NetMHCIIpan-4.3 uses its EL rank outside IC50 and BA rank for IC50; MixMHC2pred-2.0 uses its percentile-rank output.}
 \label{tab:supp-ref-pooled}
-\begin{tabular}{lrrrrrrrrrr}
+\begin{tabular}{lrrrrr}
 \toprule
- & \textbf{Qualitative} & \textbf{Qualitative $n$} & \textbf{MS} & \textbf{MS $n$} & \textbf{IC50 $<$500} & \textbf{IC50 $<$500 $n$} & \textbf{IC50 $<$1000} & \textbf{IC50 $<$1000 $n$} & \textbf{H2-Out} & \textbf{H2-Out $n$} \\
+ & \textbf{Qualitative} & \textbf{MS} & \textbf{IC50 $<$500} & \textbf{IC50 $<$1000} & \textbf{H2-Out} \\
 \midrule
-BLOSUM62 & 0.871 & -- & 0.959 & -- & 0.801 & -- & 0.796 & -- & 0.476 & -- \\
-Chai-1 & 0.914 & -- & 0.987 & -- & 0.827 & -- & 0.823 & -- & 0.628 & -- \\
-ESMC 300M & 0.919 & -- & 0.990 & -- & 0.838 & -- & 0.835 & -- & 0.680 & -- \\
-ESM3 Small & 0.921 & -- & 0.990 & -- & 0.839 & -- & 0.834 & -- & 0.682 & -- \\
-DeepNeo & 0.894 & -- & 0.980 & -- & 0.830 & -- & 0.822 & -- & 0.529 & -- \\
-\textit{NetMHCIIpan-4.3} & 0.838 & 48,175 & 0.974 & 33,332 & 0.909 & 14,110 & 0.899 & 14,110 & 0.883 & 2,557 \\
-\textit{MixMHC2pred-2.0} & 0.815 & 48,351 & 0.951 & 33,489 & 0.714 & 14,150 & 0.702 & 14,150 & 0.875 & 3,119 \\
+\multicolumn{6}{l}{\textit{Pooled ROC-AUC}} \\
+BLOSUM62 & 0.871 & 0.959 & 0.801 & 0.796 & 0.476 \\
+Chai-1 & 0.914 & 0.987 & 0.827 & 0.823 & 0.628 \\
+ESMC 300M & 0.919 & 0.990 & 0.838 & 0.835 & 0.680 \\
+ESM3 Small & 0.921 & 0.990 & 0.839 & 0.834 & 0.682 \\
+DeepNeo & 0.894 & 0.980 & 0.830 & 0.822 & 0.529 \\
+\textit{NetMHCIIpan-4.3} & 0.838 & 0.974 & 0.909 & 0.899 & 0.883 \\
+\textit{MixMHC2pred-2.0} & 0.815 & 0.951 & 0.714 & 0.702 & 0.875 \\
+\midrule
+\multicolumn{6}{l}{\textit{Effective $n$. The retrained models are scored on every test row.}} \\
+\textit{NetMHCIIpan-4.3} & 48,175 & 33,332 & 14,110 & 14,110 & 2,557 \\
+\textit{MixMHC2pred-2.0} & 48,351 & 33,489 & 14,150 & 14,150 & 3,119 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -139,6 +144,29 @@ ESM3 Small vs MixMHC2pred-2.0 & 47 & +0.077 & 2.04e-07 & 3.27e-06 & *** \\
 DeepNeo vs NetMHCIIpan-4.3 & 47 & +0.032 & 4.42e-02 & 1.77e-01 & ns \\
 DeepNeo vs MixMHC2pred-2.0 & 47 & +0.052 & 3.57e-04 & 1.79e-03 & ** \\
 NetMHCIIpan-4.3 vs MixMHC2pred-2.0 & 47 & +0.019 & 5.53e-07 & 7.19e-06 & *** \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\small
+\caption{Holm-corrected paired Wilcoxon tests for the 38 withheld molecules in Figure~3b (LOMO), at the $\beta$-chain unit so DeepNeo is comparable with the others. $\Delta$ is the median paired difference ($a-b$). The published tools are absent because they were not retrained under the leave-one-molecule-out splits.}
+\label{tab:supp-lomo-pairs}
+\begin{tabular}{lrrrrr}
+\toprule
+ & \textbf{$n$} & \textbf{$\Delta$} & \textbf{$p$} & \textbf{$p_{\mathrm{adj}}$} & \textbf{Sig.} \\
+\midrule
+BLOSUM62 vs Chai-1 & 38 & -0.077 & 7.28e-12 & 7.28e-11 & *** \\
+BLOSUM62 vs ESMC 300M & 38 & -0.085 & 7.28e-12 & 7.28e-11 & *** \\
+BLOSUM62 vs ESM3 Small & 38 & -0.062 & 1.38e-10 & 1.11e-09 & *** \\
+BLOSUM62 vs DeepNeo & 38 & -0.049 & 1.60e-05 & 1.12e-04 & *** \\
+Chai-1 vs ESMC 300M & 38 & -0.003 & 8.71e-02 & 1.30e-01 & ns \\
+Chai-1 vs ESM3 Small & 38 & +0.012 & 4.47e-03 & 1.34e-02 & * \\
+Chai-1 vs DeepNeo & 38 & +0.022 & 1.74e-04 & 8.70e-04 & *** \\
+ESMC 300M vs ESM3 Small & 38 & +0.014 & 2.14e-04 & 8.70e-04 & *** \\
+ESMC 300M vs DeepNeo & 38 & +0.024 & 3.95e-05 & 2.37e-04 & *** \\
+ESM3 Small vs DeepNeo & 38 & +0.006 & 6.51e-02 & 1.30e-01 & ns \\
 \bottomrule
 \end{tabular}
 \end{table}

@@ -49,6 +49,8 @@ dependencies = [
     # Supplementary Figure S1, which `make figures` builds
     "upsetplot",
     "svgutils",
+    # figS1_dataset_overlap.ipynb converts the assembled SVG to PDF with it
+    "cairosvg",
 ]
 
 [project.optional-dependencies]

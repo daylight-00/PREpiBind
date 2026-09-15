@@ -119,6 +119,9 @@ def pairs_lomo() -> pd.DataFrame:
     return res[['a', 'b', 'n', 'median_delta', 'p', 'p_adj', 'sig']]
 
 
+REF_TOOLS = ('NetMHCIIpan-4.3', 'MixMHC2pred-2.0')
+
+
 def _tex(df: pd.DataFrame, caption: str, label: str, fmt: dict) -> str:
     cols = 'l' + 'r' * len(df.columns)
     head = ' & '.join([''] + [f'\\textbf{{{c}}}' for c in df.columns]) + ' \\\\'
@@ -126,13 +129,49 @@ def _tex(df: pd.DataFrame, caption: str, label: str, fmt: dict) -> str:
     for name, row in df.iterrows():
         cells = [fmt.get(c, '{:.3f}').format(row[c]) if pd.notna(row[c]) else '--'
                  for c in df.columns]
-        bold = name in ('NetMHCIIpan-4.3', 'MixMHC2pred-2.0')
+        bold = name in REF_TOOLS
         nm = f'\\textit{{{name}}}' if bold else name
         lines.append(' & '.join([nm] + cells) + ' \\\\')
     return ('\\begin{table}[H]\n\\centering\n\\small\n'
             f'\\caption{{{caption}}}\n\\label{{{label}}}\n'
             f'\\begin{{tabular}}{{{cols}}}\n\\toprule\n{head}\n\\midrule\n'
             + '\n'.join(lines)
+            + '\n\\bottomrule\n\\end{tabular}\n\\end{table}\n')
+
+
+def _tex_pooled(p: pd.DataFrame, caption: str, label: str) -> str:
+    """The pooled table as two stacked panels.
+
+    Interleaving ROC-AUC with its effective `n` needs eleven columns, which runs off
+    the page and silently drops the rightmost three -- H2-out among them. The `n` is
+    only ever populated for the two published tools, so it becomes a second panel and
+    the table fits.
+    """
+    auc = [c for c in p.columns if not c.endswith('$n$')]
+    head = ' & '.join([''] + [f'\\textbf{{{c}}}' for c in auc]) + ' \\\\'
+    span = len(auc) + 1
+
+    def rows(cols, fmt, only=None):
+        out = []
+        for name, row in p.iterrows():
+            if only is not None and name not in only:
+                continue
+            nm = f'\\textit{{{name}}}' if name in REF_TOOLS else name
+            out.append(' & '.join(
+                [nm] + [fmt.format(row[c]) if pd.notna(row[c]) else '--' for c in cols]
+            ) + ' \\\\')
+        return out
+
+    body = ([f'\\multicolumn{{{span}}}{{l}}{{\\textit{{Pooled ROC-AUC}}}} \\\\']
+            + rows(auc, '{:.3f}')
+            + ['\\midrule',
+               f'\\multicolumn{{{span}}}{{l}}{{\\textit{{Effective $n$. The retrained models '
+               f'are scored on every test row.}}}} \\\\']
+            + rows([f'{c} $n$' for c in auc], '{:,.0f}', only=REF_TOOLS))
+    return ('\\begin{table}[H]\n\\centering\n\\small\n'
+            f'\\caption{{{caption}}}\n\\label{{{label}}}\n'
+            f'\\begin{{tabular}}{{l{"r" * len(auc)}}}\n\\toprule\n{head}\n\\midrule\n'
+            + '\n'.join(body)
             + '\n\\bottomrule\n\\end{tabular}\n\\end{table}\n')
 
 
@@ -147,7 +186,7 @@ def main() -> None:
     wl.to_csv(f'{HERE}/supp_ref_pairs_lomo.csv', index=False)
 
     tex = [
-        _tex(
+        _tex_pooled(
             p,
             'Pooled ROC-AUC and effective sample sizes for all representations and the two '
             'published tools. The tools are scored only on supported alleles and were not '
@@ -155,7 +194,6 @@ def main() -> None:
             'NetMHCIIpan-4.3 uses its EL rank outside IC50 and BA rank for IC50; '
             'MixMHC2pred-2.0 uses its percentile-rank output.',
             'tab:supp-ref-pooled',
-            {col: '{:,.0f}' for col in p.columns if col.endswith('$n$')},
         ),
         _tex(
             c,
@@ -228,6 +266,30 @@ def main() -> None:
             '$\\Delta$ is the median paired difference ($a-b$). Published-tool comparisons '
             'remain contextual because those tools were not trained on the present splits.',
             'tab:supp-ref-pairs-beta',
+            {
+                '$n$': '{:.0f}',
+                '$\\Delta$': '{:+.3f}',
+                '$p$': '{:.2e}',
+                '$p_{\\mathrm{adj}}$': '{:.2e}',
+                'Sig.': '{}',
+            },
+        ),
+        _tex(
+            wl.set_index(wl['a'] + ' vs ' + wl['b']).drop(columns=['a', 'b']).rename(
+                columns={
+                    'n': '$n$',
+                    'median_delta': '$\\Delta$',
+                    'p': '$p$',
+                    'p_adj': '$p_{\\mathrm{adj}}$',
+                    'sig': 'Sig.',
+                }
+            ),
+            'Holm-corrected paired Wilcoxon tests for the 38 withheld molecules in '
+            'Figure~3b (LOMO), at the $\\beta$-chain unit so DeepNeo is comparable with '
+            'the others. $\\Delta$ is the median paired difference ($a-b$). The published '
+            'tools are absent because they were not retrained under the '
+            'leave-one-molecule-out splits.',
+            'tab:supp-lomo-pairs',
             {
                 '$n$': '{:.0f}',
                 '$\\Delta$': '{:+.3f}',
