@@ -2,8 +2,7 @@
 
 DeepNeo holds out beta chains (38 molecules) while the other models hold out
 alpha/beta pairs (47), because DeepNeo does not model the alpha chain. The two
-sets map 1:1 onto 38 beta chains, so the comparison is sound, but the n differs -
-see docs/notes/2026-08-29-lomo-deepneo-testset.md.
+sets map 1:1 onto 38 beta chains, so the comparison is sound, but the n differs.
 """
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

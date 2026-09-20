@@ -2,8 +2,7 @@
 
 This is the analysis behind `tab:supp-stratified` and the main-text sentence
 "BLOSUM62 showed roughly twice the ROC-AUC drop" (oup:358). It used to be an ad-hoc
-recomputation with no code in this tree - docs/notes/2026-08-30-changes-since-843297b.md
-records it as such - which is why it could not be re-derived when the BLOSUM62
+recomputation with no code in this tree, which is why it could not be re-derived when the BLOSUM62
 baseline was re-run. It lives here now.
 
 ## The strata

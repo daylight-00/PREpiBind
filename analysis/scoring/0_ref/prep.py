@@ -49,7 +49,7 @@ SOURCES = {
 #: 2_ms/config.py had been measured on it, which is the split mismatch this whole
 #: stage exists to repair. Its rows are scored only so verify.py can re-derive
 #: those retired numbers and show where they came from - that check is what
-#: identified the file docs/notes/2026-08-30-value-update.md section 6 had given up on. Nothing
+#: identified the file an earlier audit had given up on. Nothing
 #: downstream joins against it: pipeline.ref_level() takes its test paths from
 #: per_run, so a number can only ever be reported on a split some representation
 #: was actually scored on.

@@ -19,7 +19,6 @@ flag (Score_, ScorePWM_), which score.py does not pass; none is an affinity, its
 README warns Score_ cannot be transformed to the %Rank, and ScorePWM_ is
 unbounded and PWM-only, so neither is on a shared scale with Score_EL. So a
 comparison between the tools has to run on -%Rank, and `metrics.py` uses that.
-See docs/notes/2026-09-01-mixmhc2pred-no-affinity-head.md.
 
 `el_score` is NetMHCIIpan's raw 0-1 output. It is kept because %Rank is
 normalised *within an allele*: pooling %Rank over 126 alleles is not the same

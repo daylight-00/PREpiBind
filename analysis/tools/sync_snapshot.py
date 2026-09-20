@@ -43,11 +43,10 @@ ROOTS = [
     # measurement scratch, not results, and are deliberately not roots.
     '260829/ms', '260829/lomo',
     # 260830 filled tab:perf-summary's remaining blanks: af3, boltz, esmc_large,
-    # esmc_medium and esm3_medium on MS (ms_ql) and IC50 (500/1000). Lives in
-    # project2/, reached through the 1_ms / 2_ic50 symlinks inside 260830/ -
-    # that directory already existed here for the reference-tool rescoring, so the
-    # whole dir could not be one link. esm3_large is in the same tree but is still
-    # running and is filtered out in the analysis configs, not here.
+    # esmc_medium and esm3_medium on MS (ms_ql) and IC50 (500/1000). Reached
+    # through the 1_ms / 2_ic50 entries inside 260830/, which already held the
+    # reference-tool rescoring. esm3_large sits alongside them and is filtered out
+    # in the analysis configs, not here.
     '260830/1_ms', '260830/2_ic50',
     # 260905/9_blosum_rerun REPLACES the published BLOSUM62 cells. The published
     # baseline was fed full[2s:e] instead of full[s:e] - about half the groove
@@ -56,8 +55,7 @@ ROOTS = [
     # the snapshot and in this manifest so the published numbers remain
     # reproducible; the analysis configs are what switch over, by adding this root
     # and dropping blosum from the five published roots. Reached through the
-    # 9_blosum_rerun symlink inside 260905/, the same arrangement 260830 uses.
-    # See docs/notes/2026-09-06-blosum-rerun-result-is-null.md.
+    # 9_blosum_rerun entry inside 260905/, the same arrangement 260830 uses.
     '260905/9_blosum_rerun',
 ]
 

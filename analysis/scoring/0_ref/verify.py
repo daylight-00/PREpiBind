@@ -7,8 +7,7 @@
 
 2. The retired `extra_rows` scalars are reproduced. MS means ms_ql throughout; scoring/2_ms/config.py carries
    roc_auc=0.9718296579610518 for netmhcpan and 0.950912204811488 for mixmhcpred
-   as hand-entered `extra_rows`, and docs/notes/2026-08-30-value-update.md records that the file
-   behind them could not be identified. They had been measured on the unused
+   as hand-entered `extra_rows`, and the file behind them could not be identified at the time. They had been measured on the unused
    ms_ic construction rather than on the MS split, which is the mismatch this
    stage repairs. Scoring the new predictions on those rows should land on the
    retired values - that is what makes them traceable, and it is the only reason

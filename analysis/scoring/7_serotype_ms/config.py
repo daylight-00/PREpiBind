@@ -35,6 +35,6 @@ CONFIG = dict(
     # pipeline.ref_level() on the ms_ql rows above. The eight scalars that used to
     # sit here came from 250714/10_ms/6_serotype/metrics_results_max_.csv, were
     # measured on ms_ic rather than ms_ql, and were hand-added so they were lost on
-    # any regeneration. See docs/notes/2026-08-30-ref-rescore.md.
+    # any regeneration.
     ref=True,
 )

@@ -26,8 +26,8 @@ CONFIG = dict(
            # NOT (s42 5 folds, s100 4, s128 1 at the time of writing), so
            # coverage.csv carries three rows for it and the aggregate there
            # averages incomplete seeds. The manuscript must take esm3_large's
-           # IC50<1000 value from seed_level_results.csv, seed s42 only, until
-           # job 263138 finishes. See docs/notes/2026-09-03-esm3-large-filled.md.
+           # IC50<1000 value from seed_level_results.csv, seed s42 only, for as
+           # long as that arm's remaining folds are incomplete.
            '260830/2_ic50',
            # BLOSUM62 recomputed with the fixed encoder; pl.use_rerun_blosum below
            # drops the superseded published cells. See pipeline.BLOSUM_RERUN_ROOT.
@@ -60,6 +60,5 @@ CONFIG = dict(
     # the -%Rank convention and the within-allele calibration caveat hold for every
     # reference cell alike. MixMHC2pred-2.0 has no affinity head, so its row is
     # unchanged and stays a ligand-likelihood %Rank.
-    # See docs/notes/2026-09-01-netmhciipan-el-vs-ba.md.
     ref_col={'netmhcpan': 'ba_rank'},
 )

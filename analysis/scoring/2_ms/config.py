@@ -36,7 +36,6 @@ CONFIG = dict(
     # ms_ql rows above rather than typed in. The scalars that used to sit here
     # (0.9718296579610518 / 0.950912204811488) were measured on ms_ic, which is a
     # different 20,627-row split, and the file behind them had been lost - the
-    # mismatch docs/reference/experiment-dirs.md and docs/notes/2026-08-29-missing-model-coverage.md
-    # section 7 both flagged. See docs/notes/2026-08-30-ref-rescore.md.
+    # mismatch that prompted the reference-tool rescoring in scoring/0_ref/.
     ref=True,
 )

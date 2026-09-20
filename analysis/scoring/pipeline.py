@@ -63,15 +63,13 @@ VAL_METRICS = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 NO_SIGMOID = ('deepneo',)
 
 #: the two published tools, as (template model id) -> (prediction file, %Rank column).
-#: Produced by scoring/0_ref/ (prep -> score -> collect); see
-#: docs/notes/2026-08-30-ref-rescore.md. Both columns are a %Rank against a fixed
+#: Produced by scoring/0_ref/ (prep -> score -> collect). Both columns are a %Rank against a fixed
 #: random-peptide background, lower meaning better binder, so the score fed to a
 #: metric is -%Rank. It is the only *comparable* quantity the two tools share.
 #: MixMHC2pred-2.0 does emit raw scores under its -e flag (Score_, ScorePWM_),
 #: which 0_ref/score.py does not pass: none of them is an affinity, its README
 #: warns Score_ cannot be transformed to the %Rank, and ScorePWM_ is unbounded
 #: and PWM-only, so none is on a shared scale with NetMHCIIpan's Score_EL.
-#: See docs/notes/2026-09-01-mixmhc2pred-no-affinity-head.md.
 #:
 #: The column here is a *default*. An analysis overrides it with a `ref_col` dict
 #: in its config.py, because NetMHCIIpan-4.3 has two heads with different training
@@ -82,8 +80,7 @@ NO_SIGMOID = ('deepneo',)
 #:
 #: 3_ic overrides to ba_rank for exactly that reason; scoring binarised measured
 #: IC50 with the eluted-ligand head cost NetMHCIIpan 0.18-0.20 ROC-AUC, in the
-#: direction that flatters the representations. See
-#: docs/notes/2026-09-01-netmhciipan-el-vs-ba.md. Every override must stay a
+#: direction that flatters the representations. Every override must stay a
 #: %Rank so the -%Rank convention and the within-allele calibration caveat hold
 #: unchanged.
 REF_PRED = {
@@ -107,8 +104,7 @@ SEEDS = ('s42', 's100', 's128')
 #: preprocessing claim, so all 805 were re-run. The published prediction files stay
 #: in the snapshot and in raw_manifest.csv, because the old numbers must remain
 #: reproducible; the switch therefore happens HERE, not by overwriting them.
-#: Measured effect: allele-wise 0.780 -> 0.781, paired Wilcoxon p = 0.99. See
-#: docs/notes/2026-09-06-blosum-rerun-result-is-null.md.
+#: Measured effect: allele-wise 0.780 -> 0.781, paired Wilcoxon p = 0.99.
 BLOSUM_RERUN_ROOT = '260905/9_blosum_rerun'
 
 
