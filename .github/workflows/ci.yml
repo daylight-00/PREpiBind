@@ -38,7 +38,7 @@ jobs:
         run: python .github/scripts/check_release_names.py
 
       - name: Everything shipped is at least syntactically valid
-        run: python -m compileall -q prepibind configs demo pipeline analysis tools supplementary_data
+        run: python -m compileall -q prepibind configs demo pipeline analysis supplementary_data
 
   package:
     name: import the package (py${{ matrix.python }})

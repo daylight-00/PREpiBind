@@ -48,9 +48,9 @@ of 555. The `.svg` companions are a different matter — they carry a generation
 nothing strips, so `make figures` always leaves them modified in `git status`.
 
 `make scoring` aborts unless `PREPIBIND_RAW_ROOT` points at the unpacked snapshot; `rawpath` falls
-back to `IMG_RAW_ROOT`, then to `0_raw/` beside it. The snapshot is in no clone and is not yet
-downloadable: the archival deposit that will carry it is staged but has no host and no DOI, see
-`tools/release/deposit/README.md`.
+back to `IMG_RAW_ROOT`, then to `0_raw/` beside it. The snapshot is in no clone: download it from the
+archival deposit at <https://doi.org/10.5281/zenodo.22857374>, which carries it as
+`0_raw_260910_deposit.tar.zst` together with the deposit's own README.
 
 ## The snapshot mirrors the scratch path
 

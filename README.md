@@ -231,7 +231,7 @@ The preprint is not posted yet; the DOI will be added here when it is.
 ## License
 
 MIT **for the code**, see [LICENSE](LICENSE) — `prepibind/`, `configs/`, `demo/`, `pipeline/`,
-`analysis/`, `supplementary_data/` and `tools/`.
+`analysis/` and `supplementary_data/`.
 
 **The data is not MIT.** `data/`, `demo/data/` and `analysis/figures/data/` are derived from IEDB
 (CC BY 4.0), IPD-IMGT/HLA and IPD-MHC (CC BY-NoDerivs) and UniProt (CC BY 4.0). The IPD-IMGT/HLA

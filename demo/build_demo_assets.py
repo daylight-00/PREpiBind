@@ -48,8 +48,7 @@ def research_store():
 
     It is not distributed with the repository, so no path in a fresh clone holds it and there is no
     default: PREPIBIND_EMB_ROOT must name the directory it is in. Resolved on use, not at import,
-    because `tools/release/convert_checkpoints.py` imports this module for `cmd_checkpoint`, which
-    needs no store at all.
+    so that importing this module for its checkpoint helpers does not require a store.
     """
     root = os.environ.get("PREPIBIND_EMB_ROOT")
     if not root:
