@@ -38,4 +38,6 @@ preferred-citation:
       given-names: "Juyong"
   journal: "bioRxiv"
   year: 2026
-  # doi: unset. The preprint is not posted; add the 10.1101/... DOI when it is.
+  month: 9
+  doi: "10.64898/2026.09.15.751749"
+  url: "https://www.biorxiv.org/content/10.64898/2026.09.15.751749v1"
