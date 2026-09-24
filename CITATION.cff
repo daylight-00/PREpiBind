@@ -19,6 +19,14 @@ repository-code: "https://github.com/daylight-00/PREpiBind"
 license: MIT
 version: 1.0.0
 date-released: 2026-09-24
+doi: "10.5281/zenodo.22934281"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.22934281"
+    description: "Concept DOI, resolving to the most recent archived version"
+  - type: doi
+    value: "10.5281/zenodo.22934282"
+    description: "Archived snapshot of v1.0.0"
 
 preferred-citation:
   type: article

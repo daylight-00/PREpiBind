@@ -248,6 +248,11 @@ Posted on bioRxiv 2026-09-21 as [doi:10.64898/2026.09.15.751749](https://doi.org
 }
 ```
 
+To cite the software itself, use the archived release:
+[doi:10.5281/zenodo.22934281](https://doi.org/10.5281/zenodo.22934281). That is the concept DOI and
+always resolves to the most recent archived version; `10.5281/zenodo.22934282` is the v1.0.0
+snapshot.
+
 ## License
 
 MIT **for the code**, see [LICENSE](LICENSE) — `prepibind/`, `configs/`, `demo/`, `pipeline/`,
