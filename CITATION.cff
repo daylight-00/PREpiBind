@@ -7,10 +7,10 @@ authors:
     given-names: "David Hyunyoo"
   - family-names: Kim
     given-names: "Dongwoo"
-  - family-names: Park
-    given-names: "Byungho"
   - family-names: Hwang
     given-names: "Untaek"
+  - family-names: Park
+    given-names: "Byungho"
   - family-names: Choi
     given-names: "Yoonjoo"
   - family-names: Lee
@@ -28,10 +28,10 @@ preferred-citation:
       given-names: "David Hyunyoo"
     - family-names: Kim
       given-names: "Dongwoo"
-    - family-names: Park
-      given-names: "Byungho"
     - family-names: Hwang
       given-names: "Untaek"
+    - family-names: Park
+      given-names: "Byungho"
     - family-names: Choi
       given-names: "Yoonjoo"
     - family-names: Lee
