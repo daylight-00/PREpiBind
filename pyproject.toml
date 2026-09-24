@@ -23,7 +23,7 @@ packages = ["prepibind", "prepibind.esmc", "prepibind.utils"]
 
 [project]
 name = "prepibind"
-version = "1.0.0"
+version = "1.0.1"
 description = "PREpiBind: protein-representation-integrated epitope-MHC class II binding prediction"
 readme = "README.md"
 license = { file = "LICENSE" }
