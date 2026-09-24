@@ -13,8 +13,8 @@ representations. It encodes epitopes on the fly with
 [ESMC 300M](https://huggingface.co/daylight-00/esmc-300m-2024-12) and reads pre-computed HLA
 embeddings for the alpha and beta chains, feeding both into a lightweight cross-attention head.
 
-This repository is both the released model and the paper's artifact: every dataset, table and
-quantitative figure can be rebuilt from what is here. See [Reproducing the paper](#reproducing-the-paper).
+Every dataset, table and quantitative figure can be rebuilt from what is here — see
+[Reproducing the paper](#reproducing-the-paper).
 
 ---
 
@@ -219,8 +219,6 @@ does not fit. CPU-only inference works but is slow on large inputs.
 
 ## Citation
 
-Posted on bioRxiv 2026-09-21 as [doi:10.64898/2026.09.15.751749](https://doi.org/10.64898/2026.09.15.751749), CC BY 4.0.
-
 ```bibtex
 @article{jang2026prepibind,
   title   = {PREpiBind: Protein Representation-integrated Epitope-MHC Class II Binding Prediction},
@@ -232,21 +230,15 @@ Posted on bioRxiv 2026-09-21 as [doi:10.64898/2026.09.15.751749](https://doi.org
 }
 ```
 
-To cite the software itself, use the archived release:
-[doi:10.5281/zenodo.22934281](https://doi.org/10.5281/zenodo.22934281). That is the concept DOI and
-always resolves to the most recent archived version; `10.5281/zenodo.22934282` is the v1.0.0
-snapshot.
-
 ## License
 
 MIT **for the code**, see [LICENSE](LICENSE) — `prepibind/`, `configs/`, `demo/`, `pipeline/`,
 `analysis/` and `supplementary_data/`.
 
 **The data is not MIT.** `data/`, `demo/data/` and `analysis/figures/data/` derive from IEDB,
-IPD-IMGT/HLA and UniProt, each under its own terms. Per-file terms are in
-[data/LICENSE.md](data/LICENSE.md); attribution, citations and the IPD-IMGT/HLA permission are in
-[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+IPD-IMGT/HLA and UniProt. Terms per file: [data/LICENSE.md](data/LICENSE.md). Attribution and
+citations: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
-`prepibind/esmc/` is vendored from `esm` 3.4.0, MIT as well but under a different copyright holder,
-so its licence travels with it in `prepibind/esmc/LICENSE-esm.md`. Third-party models, weights and
-tools carry their own terms; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+`prepibind/esmc/` is vendored from `esm` 3.4.0 under a different copyright holder, so its licence
+travels with it in `prepibind/esmc/LICENSE-esm.md`. Third-party models, weights and tools carry
+their own terms.
