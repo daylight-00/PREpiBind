@@ -73,7 +73,7 @@ paper do.
 - **What is redistributed.** 134 rows of gap-free, full-length class II chain sequence — 116 HLA and 18 murine H2 from UniProt — each with the peptide-binding window carried beside it as coordinates; those window and collapse decisions are ours. The cut is applied only in `demo/data/mhc_mapping_demo.csv`. `data/mhc_mapping/mhc_sources.csv` names the four-field IPD-IMGT/HLA allele behind each row, so every sequence can be traced to release 3.59.0.
 - **These files are processed data and are not an official IPD-IMGT/HLA release.** They are filtered to the alleles this study uses, gap-stripped, and renamed to two-field identifiers.
 - **The alignment is still not redistributed.** `pipeline/preprocess/fetch_mhc_alignment.py` downloads it from `github.com/ANHIG/IMGTHLA`, and `pipeline/preprocess/mhc_sequences/filtered_manual.json` records each hand collapse decision as the allele it resolved to rather than as the sequence.
-- **The 20 IPD-MHC rows (BoLA, SLA, Mamu) are not redistributed.** The permission covers IPD-IMGT/HLA; IPD-MHC was not part of the request. No code here produces them and no dataset row references any of them.
+- **BoLA, SLA and Mamu are not part of this study.** Twenty such rows had been carried along in the mapping tables from unrelated work. They are removed: no dataset row references them, no reported number depends on them, and the manuscript does not mention them.
 - **Citations, as `LICENCE.md` asks.** All three are cited in the paper: Barker DJ, Natarajan RHL,
   Cooper MA, Hopper SJF, Yates AD, Parham P, Marsh SGE, Robinson J, *The IPD-IMGT/HLA Database:
   recent developments in sequence submission*, Nucleic Acids Research (2026) 54(D1):D1152–D1158,
@@ -81,10 +81,6 @@ paper do.
   Database*, HLA (2024) 103(6):e15549; Robinson J, Malik A, Parham P, Bodmer JG, Marsh SGE,
   *IMGT/HLA — a sequence database for the human major histocompatibility complex*, Tissue Antigens
   (2000) 55:280–287.
-- **IPD-MHC** (BoLA, SLA, Mamu rows) is covered by
-  [`ebi.ac.uk/ipd/licence/`](https://www.ebi.ac.uk/ipd/licence/), same terms. It names Robinson J,
-  Maccari G, Marsh SGE, et al. *KIR Nomenclature in non-human species*, Immunogenetics (2018);
-  that reference is marked "in preparation" and does not resolve, so it is given as the page gives it.
 - The demo embedding store and `daylight-00/prepibind-embeddings` are per-residue representations of
   these sequences and carry the same attribution.
 

@@ -12,9 +12,9 @@ the H2 chain correction that follows it, are the last two steps between stage 0 
 
 What reproduces, and what does not, measured rather than assumed:
 
-  * **Membership.** 116 alleles are reachable from the datasets; the published tables carry 154.
-    The extra 38 are non-human, non-murine entries (BoLA, Patr and similar) curated alongside them
-    and not derivable from the dataset files. They are carried over, not rebuilt.
+  * **Membership.** 116 alleles are reachable from the datasets and the published tables carry 134.
+    The extra 18 are the murine H2 chains, which come from UniProt rather than from stage 0 and
+    are carried over, not rebuilt.
   * **Sequences.** 113 of the 116 reproduce exactly. Three (HLA-DQB1*03:01, *05:03, *06:01) differ
     by an eight-residue segment (PQGPPPAG) near the C terminus, at residue 258 and beyond. The
     peptide-binding window for those alleles is 44|119, so the *sliced* sequences -- the only part
