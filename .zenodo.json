@@ -1,0 +1,72 @@
+{
+  "upload_type": "software",
+  "title": "PREpiBind: Protein Representation-integrated Epitope-MHC Class II Binding Prediction",
+  "description": "<p>PREpiBind is a dual-stream, joint-attention framework for peptide&ndash;MHC class II binding prediction. It holds one downstream architecture fixed so that ten protein representations &mdash; a substitution matrix, structure-prediction-derived features and protein language models &mdash; can be compared on equal terms across qualitative binding, mass spectrometry and thresholded IC50 datasets.</p><p>This record archives the source snapshot of a tagged release: the model, the released checkpoint configurations and the inference CLI, the preprocessing, embedding and analysis pipelines, the scripts behind every figure, the IEDB-derived training and evaluation datasets, and a runnable demo.</p><p><strong>Licensing is not uniform across this archive.</strong> The code is MIT. The data is not, and the record-level licence field cannot express the difference, so it is set to &quot;Other (Open)&quot;. Per-file terms are in <code>data/LICENSE.md</code> and <code>THIRD_PARTY_NOTICES.md</code> inside the archive:</p><ul><li><strong>IEDB-derived datasets</strong> &mdash; CC BY 4.0, modified from the <code>mhc_ligand_full</code> export of 21 April 2025.</li><li><strong>IPD-IMGT/HLA chain sequences</strong> (release 3.59.0, via <a href=\"https://github.com/ANHIG/IMGTHLA\">ANHIG/IMGTHLA</a>) &mdash; CC BY-NoDerivs, <strong>redistributed by permission of Anthony Nolan granted 24 September 2026</strong>, on the condition that Anthony Nolan be contacted to review the agreement should this work become commercial or otherwise make profit. These are processed data and are not an official IPD-IMGT/HLA release. The alignment itself is not redistributed; <code>pipeline/preprocess/fetch_mhc_alignment.py</code> downloads it.</li><li><strong>Murine H2 chains</strong> &mdash; UniProt, CC BY 4.0.</li><li><strong>Vendored ESMC encoder source</strong> &mdash; MIT, &copy; Chan Zuckerberg Biohub, licence travelling with <code>prepibind/esmc/</code>.</li></ul><p>The raw model predictions behind every reported number, and the IEDB export the datasets were built from, are archived separately as a dataset record: <a href=\"https://doi.org/10.5281/zenodo.22857373\">10.5281/zenodo.22857373</a>. They are not in this archive because of their size, and because that record exists to identify the IEDB snapshot, which IEDB itself does not version.</p>",
+  "access_right": "open",
+  "license": "other-open",
+  "language": "eng",
+  "creators": [
+    {
+      "name": "Jang, David Hyunyoo",
+      "affiliation": "College of Pharmacy, Seoul National University",
+      "orcid": "0009-0000-1474-1393"
+    },
+    {
+      "name": "Kim, Dongwoo",
+      "affiliation": "College of Pharmacy, Seoul National University",
+      "orcid": "0009-0000-6141-060X"
+    },
+    {
+      "name": "Hwang, Untaek",
+      "affiliation": "College of Pharmacy, Seoul National University",
+      "orcid": "0009-0005-6310-4290"
+    },
+    {
+      "name": "Park, Byungho",
+      "affiliation": "College of Pharmacy, Seoul National University",
+      "orcid": "0009-0000-1179-692X"
+    },
+    {
+      "name": "Choi, Yoonjoo",
+      "affiliation": "Chonnam National University Medical School",
+      "orcid": "0000-0001-9687-8093"
+    },
+    {
+      "name": "Lee, Juyong",
+      "affiliation": "College of Pharmacy, Seoul National University",
+      "orcid": "0000-0003-1174-4358"
+    }
+  ],
+  "keywords": [
+    "MHC class II",
+    "peptide binding prediction",
+    "protein language models",
+    "protein representation",
+    "immunoinformatics",
+    "epitope prediction"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "10.64898/2026.09.15.751749",
+      "relation": "isSupplementTo",
+      "scheme": "doi",
+      "resource_type": "publication-preprint"
+    },
+    {
+      "identifier": "10.5281/zenodo.22857373",
+      "relation": "isSupplementedBy",
+      "scheme": "doi",
+      "resource_type": "dataset"
+    },
+    {
+      "identifier": "https://github.com/ANHIG/IMGTHLA",
+      "relation": "references",
+      "scheme": "url"
+    },
+    {
+      "identifier": "https://www.iedb.org",
+      "relation": "references",
+      "scheme": "url"
+    }
+  ]
+}
