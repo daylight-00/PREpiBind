@@ -69,7 +69,7 @@ paper do.
   [`github.com/ANHIG/IMGTHLA`](https://github.com/ANHIG/IMGTHLA), **release 3.59.0** (2025-01-15).
   Its `LICENCE.md` governs them: CC BY-NoDerivs, and it asks that the data be linked to rather than
   mirrored, and that permission be sought before a modified version is distributed.
-- **Permission.** Granted by Dr James Robinson, Anthony Nolan, 24 September 2026, on one condition: *"should your work become commercial, or otherwise make profit, that you would contact us to review the agreement"*.
+- **Permission.** Granted by Anthony Nolan, 24 September 2026, on one condition: *"should your work become commercial, or otherwise make profit, that you would contact us to review the agreement"*.
 - **Processed data, not an official IPD-IMGT/HLA release.** Filtered to the alleles this study uses, gap-stripped, renamed to two-field identifiers. `data/mhc_mapping/mhc_sources.csv` names the four-field allele behind each row.
 - **The alignment is still not redistributed.** `pipeline/preprocess/fetch_mhc_alignment.py` downloads it from `github.com/ANHIG/IMGTHLA`, and `pipeline/preprocess/mhc_sequences/filtered_manual.json` records each hand collapse decision as the allele it resolved to rather than as the sequence.
 - **Citations, as `LICENCE.md` asks.** All three are cited in the paper: Barker DJ, Natarajan RHL,

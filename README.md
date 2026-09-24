@@ -3,11 +3,6 @@
 ![banner](banner.png)
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22934281.svg)](https://doi.org/10.5281/zenodo.22934281)
-[![Preprint](https://img.shields.io/badge/bioRxiv-10.64898%2F2026.09.15.751749-b31b1b)](https://doi.org/10.64898/2026.09.15.751749)
-[![Models](https://img.shields.io/badge/%F0%9F%A4%97%20HuggingFace-prepibind-yellow)](https://huggingface.co/daylight-00/prepibind)
-[![Code licence: MIT](https://img.shields.io/badge/code%20licence-MIT-green)](LICENSE)
-[![Data licence](https://img.shields.io/badge/data%20licence-see%20data%2FLICENSE.md-lightgrey)](data/LICENSE.md)
-[![Python](https://img.shields.io/badge/python-%E2%89%A53.11-blue)](pyproject.toml)
 
 > **PREpiBind: Protein Representation-integrated Epitope-MHC Class II Binding Prediction**
 > David Hyunyoo Jang, Dongwoo Kim, Untaek Hwang, Byungho Park, Yoonjoo Choi, Juyong Lee.
