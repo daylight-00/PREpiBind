@@ -11,11 +11,11 @@ and last, CC BY-NoDerivs for the two IPD databases. Per-file terms: [`data/LICEN
 
 | What | Where | Terms |
 |---|---|---|
-| HLA chain sequences, full-length and gap-free, with the peptide-binding window carried alongside as coordinates. Only the demo table ships cut to that window | `data/mhc_mapping/`, `demo/data/mhc_mapping_demo.csv`, one member of `analysis/figures/data/figure_inputs.tar.zst` | IPD-IMGT/HLA release 3.59.0 (human) and IPD-MHC (BoLA, SLA, Mamu), both **CC BY-NoDerivs**, citations below. The alignment itself is **not** redistributed: `pipeline/preprocess/fetch_mhc_alignment.py` downloads it. |
-| H2 (murine) chains, 18 rows of the same tables | `data/mhc_mapping/` | UniProt, **CC BY 4.0** |
+| The four-field IPD-IMGT/HLA allele behind each row, and the peptide-binding window coordinates. **No IPD-derived sequence.** | `data/mhc_mapping/mhc_sources.csv`, `demo/data/demo_windows.csv` | Allele names and window coordinates. The names are IPD nomenclature; the coordinates are ours. `pipeline/preprocess/build_mhc_tables.py` fetches release 3.59.0 and rebuilds the sequence tables locally |
+| H2 (murine) chains, 18 rows | `data/mhc_mapping/h2_uniprot.csv` | UniProt, **CC BY 4.0**. These are redistributed because UniProt permits it |
 | Epitope–allele rows derived from IEDB: 774,446 in `data/dataset/`, plus the epitope key list, the demo input and three tables inside the figure tarball | `data/dataset/`, `data/unique_epitope_whole.csv`, `demo/data/dataset_demo.csv`, `analysis/figures/data/figure_inputs.tar.zst` | **CC BY 4.0**. Modified IEDB data — filtered, relabelled, re-split |
 | ESMC encoder source, vendored from `esm` 3.4.0 and modified as each file's header records | `prepibind/esmc/`, licence at `prepibind/esmc/LICENSE-esm.md` | **MIT**, but "Copyright 2026 Chan Zuckerberg Biohub, Inc." — which is why the licence travels with the directory. `rotary.py` also carries EleutherAI/HuggingFace's Apache-2.0 header from upstream |
-| ESMC 300M HLA embeddings, demo set | `demo/data/emb_hla_esmc_small_demo_fp16.h5` | ESMC 300M run on the `data/mhc_mapping/` sequences, so the ESM and IPD terms both bear on it |
+| ESMC 300M HLA embeddings, demo set | `demo/data/emb_hla_esmc_small_demo_fp16.h5` | ESMC 300M run on the `data/mhc_mapping/` sequences. Per-residue model representations, not sequences, and the originals cannot be recovered from them; the ESM terms bear on it directly |
 
 ## Called, not redistributed
 
@@ -68,11 +68,16 @@ paper do.
 - **Source.** The HLA sequences come from the database's own distribution,
   [`github.com/ANHIG/IMGTHLA`](https://github.com/ANHIG/IMGTHLA), **release 3.59.0** (2025-01-15).
   Its `LICENCE.md` governs them: CC BY-NoDerivs, and it asks that the data be linked to rather than
-  mirrored. The alignment is therefore fetched, not shipped
-  (`pipeline/preprocess/fetch_mhc_alignment.py`). What ships is 154 rows of gap-free chain
-  sequence — 116 HLA, 18 H2 from UniProt, 20 BoLA/SLA/Mamu from IPD-MHC — uncut, with the
-  peptide-binding window carried beside each row as coordinates; those window and collapse decisions
-  are ours (`mhc_sequences/`). The cut is applied only in `demo/data/mhc_mapping_demo.csv`.
+  mirrored, and that permission be sought before a modified version is distributed.
+- **Nothing IPD-derived is redistributed here.** Neither the alignment nor any sequence drawn from
+  it is in this repository. What ships is `data/mhc_mapping/mhc_sources.csv`: for each row, the
+  four-field allele the sequence was taken from and the peptide-binding window coordinates, both of
+  which are names and numbers rather than sequence. `pipeline/preprocess/build_mhc_tables.py`
+  fetches release 3.59.0 and rebuilds the tables locally, reproducing every allele the models use
+  byte for byte. `pipeline/preprocess/fetch_mhc_alignment.py` does the same for stage 0.
+- **The 20 IPD-MHC rows (BoLA, SLA, Mamu) are omitted entirely.** They carry the same NoDerivs
+  terms, no code here produces them, and no dataset row references any of them.
+- **The 18 murine H2 rows ship**, in `data/mhc_mapping/h2_uniprot.csv`. They are UniProt, CC BY 4.0.
 - **Citations, as `LICENCE.md` asks.** All three are cited in the paper: Barker DJ, Natarajan RHL,
   Cooper MA, Hopper SJF, Yates AD, Parham P, Marsh SGE, Robinson J, *The IPD-IMGT/HLA Database:
   recent developments in sequence submission*, Nucleic Acids Research (2026) 54(D1):D1152–D1158,

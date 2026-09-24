@@ -25,8 +25,12 @@ verified 2026-09-13 against release 3.59.0).
 
 `HLA2_IMGT.csv` collapses those to two-field names: names with a `N` or `Q` suffix are dropped, a
 group whose members all carry the same sequence keeps it, and the 296 groups that disagree take the
-sequence recorded in `mhc_sequences/filtered_manual.json` -- the hand decision made when these
-tables were first built. Everything else takes the most completely sequenced member (fewest `*`).
+member named in `mhc_sequences/filtered_manual.json` -- the hand decision made when these tables
+were first built, recorded as the four-field allele it resolved to rather than as the sequence,
+because this repository ships no IPD-derived sequence. Three of the 296 have no counterpart at
+3.59.0, their sequences having been revised in the database since, and fall back to the default
+rule. None of the three is referenced by any dataset row. Everything else takes the most completely
+sequenced member (fewest `*`).
 
 This one is not byte-identical to the copy it replaces, and both differences are accounted for.
 All 7,267 rows of the retired file come back with the same residues; it writes 7,283, the extra 16
@@ -35,13 +39,12 @@ positions where 3.59.0 writes `*`, having been staged from an earlier release, w
 differences in any actual residue -- this script normalises both gap characters to `*`, which is
 what `MHC2MSA.csv` already did and what stage 0 strips anyway.
 
-## What it does not reproduce
+## `data/mhc_mapping/` is built separately
 
-`data/mhc_mapping/` (154 rows, in the repository) was cut by hand before this chain existed, and 7
-of its 116 HLA rows carry sequences that differ from release 3.59.0 in real residues -- a database
-revision between generations, not an error here. `--check` names them. The other 109 reproduce
-exactly. No published number depends on re-deriving them: the tables themselves are what was
-trained on, and they ship.
+It is no longer in the repository either. `build_mhc_tables.py` rebuilds it from
+`data/mhc_mapping/mhc_sources.csv`, which names the four-field allele behind each row, and that path
+reproduces every row the models use byte for byte. Run that script, not this one, unless you are
+re-deriving stage 0.
 """
 import argparse
 import collections
@@ -65,7 +68,7 @@ LOCI = ["DPA1", "DPB1", "DQA1", "DQA2", "DQB1", "DQB2", "DRA", "DRB"]
 # sha256 of the two rebuilt files at release 3590, recorded 2026-09-13 on abc.
 EXPECTED = {
     "MHC2MSA.csv": "d492c29e5dec1df28bcbed2d8a8a9472d696182167398e42d466b8aa005f3927",
-    "HLA2_IMGT.csv": "b99462ba0f7fbfc9f743a28e5e1d92f800da8523b957e9f55b9cf3a3badfcc04",
+    "HLA2_IMGT.csv": "5d279d756bc5734231831b562ffa93841a13dee35aa43f7639320d1e68d270a7",
 }
 
 # The peptide-binding windows stage 0 slices, one per locus family. Kept here only so --check can
@@ -187,9 +190,21 @@ def main():
         alignment.update(got)
     print(f"  total {len(alignment)} four-field alleles at release {args.release}")
 
+    # filtered_manual.json records the hand decision as the four-field allele it resolved to, not
+    # as the sequence itself: IPD-IMGT/HLA is CC BY-NoDerivs and this repository ships no sequence
+    # of theirs. Three of the 296 groups carry no allele -- their sequence was revised in the
+    # database after these tables were cut -- and fall back to the default "fewest *" rule.
     manual_path = os.path.join(MHC_SRC, "filtered_manual.json")
-    manual = {m["HLA_short"]: m["Sequence"][0].replace(".", "*")
-              for m in json.load(open(manual_path))}
+    manual, unresolved = {}, []
+    for entry in json.load(open(manual_path)):
+        chosen = entry.get("chosen")
+        if chosen and chosen in alignment:
+            manual[entry["HLA_short"]] = alignment[chosen]
+        else:
+            unresolved.append(entry["HLA_short"])
+    if unresolved:
+        print(f"  {len(unresolved)} manual groups have no counterpart at {args.release} and take "
+              f"the default rule: {', '.join(unresolved)}")
     collapsed = collapse(alignment, manual)
     print(f"  {len(collapsed)} two-field names after dropping N/Q and collapsing "
           f"({len(manual)} groups taken from filtered_manual.json)")

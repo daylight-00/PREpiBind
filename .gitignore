@@ -216,3 +216,10 @@ cython_debug/
 pipeline/preprocess/mhc_sequences/MHC2MSA.csv
 pipeline/preprocess/mhc_sequences/HLA2_IMGT.csv
 pipeline/preprocess/mhc_sequences/_alignments/
+
+# Rebuilt locally by pipeline/preprocess/build_mhc_tables.py -- IPD-IMGT/HLA is CC BY-NoDerivs
+# and asks that modified versions of its data not be redistributed, so these are not shipped.
+data/mhc_mapping/HLA2_IMGT_light.csv
+data/mhc_mapping/HLA2_IMGT_MSA_idx.csv
+data/mhc_mapping/HLA2_IMGT_MSA_idx_edit.csv
+demo/data/mhc_mapping_demo.csv

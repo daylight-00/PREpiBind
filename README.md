@@ -18,12 +18,30 @@ quantitative figure can be rebuilt from what is here. See [Reproducing the paper
 
 ## Quick Start
 
+### First, build the MHC sequence tables
+
+This repository ships no IPD-IMGT/HLA sequence. IPD-IMGT/HLA is CC BY-NoDerivs and asks that
+modified versions of its data not be redistributed, so what ships is the allele each row was taken
+from plus our peptide-binding window coordinates. One command fetches release 3.59.0 from the
+database's own distribution and rebuilds the tables locally:
+
+```bash
+python pipeline/preprocess/build_mhc_tables.py
+```
+
+Standard library only, about 6 MB downloaded, a few seconds. It writes
+`data/mhc_mapping/HLA2_IMGT_{light,MSA_idx,MSA_idx_edit}.csv` and
+`demo/data/mhc_mapping_demo.csv`, all of which are `.gitignore`d. Run it once before the demo, the
+embedding pipeline or `analysis/figures/figS2_umap.py`. See
+[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) for the terms.
+
 ### Option A — Local Jupyter Notebook
 
 ```bash
 git clone https://github.com/daylight-00/PREpiBind
 cd PREpiBind
 pip install --extra-index-url https://download.pytorch.org/whl/cu126 -e ".[demo]"
+python pipeline/preprocess/build_mhc_tables.py
 ```
 
 `[demo]` adds only `huggingface_hub`, to download the weights. The extra index is where the pinned
