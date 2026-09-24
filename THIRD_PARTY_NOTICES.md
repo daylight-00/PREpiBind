@@ -11,7 +11,7 @@ and last, CC BY-NoDerivs for the two IPD databases. Per-file terms: [`data/LICEN
 
 | What | Where | Terms |
 |---|---|---|
-| HLA class II chain sequences, gap-free and full-length, with the peptide-binding window carried alongside as coordinates. Only the demo table ships cut to that window | `data/mhc_mapping/`, `demo/data/mhc_mapping_demo.csv`, one member of `analysis/figures/data/figure_inputs.tar.zst` | IPD-IMGT/HLA release 3.59.0, **CC BY-NoDerivs**, **redistributed with permission** (see below). `data/mhc_mapping/mhc_sources.csv` records the four-field allele each row was taken from. The alignment itself is **not** redistributed: `pipeline/preprocess/fetch_mhc_alignment.py` downloads it |
+| HLA class II chain sequences, gap-free and full-length, with the peptide-binding window as coordinates | `data/mhc_mapping/`, `demo/data/mhc_mapping_demo.csv`, one member of `analysis/figures/data/figure_inputs.tar.zst` | IPD-IMGT/HLA release 3.59.0, **CC BY-NoDerivs**, **redistributed with permission** — see below |
 | H2 (murine) chains, 18 rows of the same tables | `data/mhc_mapping/` | UniProt, **CC BY 4.0** |
 | Epitope–allele rows derived from IEDB: 774,446 in `data/dataset/`, plus the epitope key list, the demo input and three tables inside the figure tarball | `data/dataset/`, `data/unique_epitope_whole.csv`, `demo/data/dataset_demo.csv`, `analysis/figures/data/figure_inputs.tar.zst` | **CC BY 4.0**. Modified IEDB data — filtered, relabelled, re-split |
 | ESMC encoder source, vendored from `esm` 3.4.0 and modified as each file's header records | `prepibind/esmc/`, licence at `prepibind/esmc/LICENSE-esm.md` | **MIT**, but "Copyright 2026 Chan Zuckerberg Biohub, Inc." — which is why the licence travels with the directory. `rotary.py` also carries EleutherAI/HuggingFace's Apache-2.0 header from upstream |
@@ -63,17 +63,15 @@ paper do.
   published columns are verbatim IEDB values: `Epi_Seq`, `HLA_Name_full`, and the demo input's
   `Epitope`. Everything else is derived here.
 
-**IPD-IMGT/HLA and IPD-MHC — CC BY-NoDerivs.**
+**IPD-IMGT/HLA — CC BY-NoDerivs, redistributed by permission.**
 
 - **Source.** The HLA sequences come from the database's own distribution,
   [`github.com/ANHIG/IMGTHLA`](https://github.com/ANHIG/IMGTHLA), **release 3.59.0** (2025-01-15).
   Its `LICENCE.md` governs them: CC BY-NoDerivs, and it asks that the data be linked to rather than
   mirrored, and that permission be sought before a modified version is distributed.
-- **Permission to redistribute was granted.** Dr James Robinson, Director of Bioinformatics Research at Anthony Nolan, granted it by email on 24 September 2026, on one condition, quoted here in full: *"should your work become commercial, or otherwise make profit, that you would contact us to review the agreement"*. PREpiBind is academic and distributed free of charge; if that changes, Anthony Nolan is to be contacted before the change takes effect.
-- **What is redistributed.** 134 rows of gap-free, full-length class II chain sequence — 116 HLA and 18 murine H2 from UniProt — each with the peptide-binding window carried beside it as coordinates; those window and collapse decisions are ours. The cut is applied only in `demo/data/mhc_mapping_demo.csv`. `data/mhc_mapping/mhc_sources.csv` names the four-field IPD-IMGT/HLA allele behind each row, so every sequence can be traced to release 3.59.0.
-- **These files are processed data and are not an official IPD-IMGT/HLA release.** They are filtered to the alleles this study uses, gap-stripped, and renamed to two-field identifiers.
+- **Permission.** Granted by Dr James Robinson, Anthony Nolan, 24 September 2026, on one condition: *"should your work become commercial, or otherwise make profit, that you would contact us to review the agreement"*.
+- **Processed data, not an official IPD-IMGT/HLA release.** Filtered to the alleles this study uses, gap-stripped, renamed to two-field identifiers. `data/mhc_mapping/mhc_sources.csv` names the four-field allele behind each row.
 - **The alignment is still not redistributed.** `pipeline/preprocess/fetch_mhc_alignment.py` downloads it from `github.com/ANHIG/IMGTHLA`, and `pipeline/preprocess/mhc_sequences/filtered_manual.json` records each hand collapse decision as the allele it resolved to rather than as the sequence.
-- **BoLA, SLA and Mamu are not part of this study.** Twenty such rows had been carried along in the mapping tables from unrelated work. They are removed: no dataset row references them, no reported number depends on them, and the manuscript does not mention them.
 - **Citations, as `LICENCE.md` asks.** All three are cited in the paper: Barker DJ, Natarajan RHL,
   Cooper MA, Hopper SJF, Yates AD, Parham P, Marsh SGE, Robinson J, *The IPD-IMGT/HLA Database:
   recent developments in sequence submission*, Nucleic Acids Research (2026) 54(D1):D1152–D1158,

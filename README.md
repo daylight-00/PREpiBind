@@ -247,14 +247,10 @@ snapshot.
 MIT **for the code**, see [LICENSE](LICENSE) — `prepibind/`, `configs/`, `demo/`, `pipeline/`,
 `analysis/` and `supplementary_data/`.
 
-**The data is not MIT.** `data/`, `demo/data/` and `analysis/figures/data/` are derived from IEDB
-(CC BY 4.0), IPD-IMGT/HLA (CC BY-NoDerivs, redistributed here by permission) and UniProt
-(CC BY 4.0). The IPD-IMGT/HLA **alignment** is not redistributed —
-`pipeline/preprocess/fetch_mhc_alignment.py` downloads it from
-[`github.com/ANHIG/IMGTHLA`](https://github.com/ANHIG/IMGTHLA) at release 3.59.0. The processed
-chain sequences in `data/mhc_mapping/` are redistributed with Anthony Nolan's permission; see
-[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Per-file terms are in
-[data/LICENSE.md](data/LICENSE.md).
+**The data is not MIT.** `data/`, `demo/data/` and `analysis/figures/data/` derive from IEDB,
+IPD-IMGT/HLA and UniProt, each under its own terms. Per-file terms are in
+[data/LICENSE.md](data/LICENSE.md); attribution, citations and the IPD-IMGT/HLA permission are in
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 `prepibind/esmc/` is vendored from `esm` 3.4.0, MIT as well but under a different copyright holder,
 so its licence travels with it in `prepibind/esmc/LICENSE-esm.md`. Third-party models, weights and
