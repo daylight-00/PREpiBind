@@ -18,30 +18,12 @@ quantitative figure can be rebuilt from what is here. See [Reproducing the paper
 
 ## Quick Start
 
-### First, build the MHC sequence tables
-
-This repository ships no IPD-IMGT/HLA sequence. IPD-IMGT/HLA is CC BY-NoDerivs and asks that
-modified versions of its data not be redistributed, so what ships is the allele each row was taken
-from plus our peptide-binding window coordinates. One command fetches release 3.59.0 from the
-database's own distribution and rebuilds the tables locally:
-
-```bash
-python pipeline/preprocess/build_mhc_tables.py
-```
-
-Standard library only, about 6 MB downloaded, a few seconds. It writes
-`data/mhc_mapping/HLA2_IMGT_{light,MSA_idx,MSA_idx_edit}.csv` and
-`demo/data/mhc_mapping_demo.csv`, all of which are `.gitignore`d. Run it once before the demo, the
-embedding pipeline or `analysis/figures/figS2_umap.py`. See
-[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) for the terms.
-
 ### Option A — Local Jupyter Notebook
 
 ```bash
 git clone https://github.com/daylight-00/PREpiBind
 cd PREpiBind
 pip install --extra-index-url https://download.pytorch.org/whl/cu126 -e ".[demo]"
-python pipeline/preprocess/build_mhc_tables.py
 ```
 
 `[demo]` adds only `huggingface_hub`, to download the weights. The extra index is where the pinned
@@ -259,10 +241,13 @@ MIT **for the code**, see [LICENSE](LICENSE) — `prepibind/`, `configs/`, `demo
 `analysis/` and `supplementary_data/`.
 
 **The data is not MIT.** `data/`, `demo/data/` and `analysis/figures/data/` are derived from IEDB
-(CC BY 4.0), IPD-IMGT/HLA and IPD-MHC (CC BY-NoDerivs) and UniProt (CC BY 4.0). The IPD-IMGT/HLA
-alignment is not redistributed here — `pipeline/preprocess/fetch_mhc_alignment.py` downloads it from
-[`github.com/ANHIG/IMGTHLA`](https://github.com/ANHIG/IMGTHLA) at release 3.59.0. Per-file terms are
-in [data/LICENSE.md](data/LICENSE.md).
+(CC BY 4.0), IPD-IMGT/HLA (CC BY-NoDerivs, redistributed here by permission) and UniProt
+(CC BY 4.0). The IPD-IMGT/HLA **alignment** is not redistributed —
+`pipeline/preprocess/fetch_mhc_alignment.py` downloads it from
+[`github.com/ANHIG/IMGTHLA`](https://github.com/ANHIG/IMGTHLA) at release 3.59.0. The processed
+chain sequences in `data/mhc_mapping/` are redistributed with Anthony Nolan's permission; see
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Per-file terms are in
+[data/LICENSE.md](data/LICENSE.md).
 
 `prepibind/esmc/` is vendored from `esm` 3.4.0, MIT as well but under a different copyright holder,
 so its licence travels with it in `prepibind/esmc/LICENSE-esm.md`. Third-party models, weights and

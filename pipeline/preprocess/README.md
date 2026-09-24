@@ -84,7 +84,7 @@ The two files that do ship are the hand decisions behind it, which nothing upstr
 | file | what it records |
 |---|---|
 | `filtered_manual.json`| the 296 cases where several four-field names collapsed to one two-field name, with the sequence that was chosen and how many entries backed it |
-| *(removed)*           | `range_final.txt` held the hand alignment behind the peptide-binding windows. It carried IPD-derived sequence and is no longer shipped; the windows survive as `start_idx`/`end_idx` in `data/mhc_mapping/mhc_sources.csv` and in Supplementary Table S4 |
+| *(removed)*           | `range_final.txt` held the hand alignment behind the peptide-binding windows. It is no longer shipped; the windows survive as `start_idx`/`end_idx` in `data/mhc_mapping/` and `mhc_sources.csv`, and in Supplementary Table S4 |
 
 The windows are data, not a derivation: stage 0 locates `Sliced_Seq` inside `HLA_Seq`, and in the
 surviving intermediates that lookup fails for most alleles because the two tables come from

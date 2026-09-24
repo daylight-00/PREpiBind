@@ -39,12 +39,12 @@ positions where 3.59.0 writes `*`, having been staged from an earlier release, w
 differences in any actual residue -- this script normalises both gap characters to `*`, which is
 what `MHC2MSA.csv` already did and what stage 0 strips anyway.
 
-## `data/mhc_mapping/` is built separately
+## `data/mhc_mapping/` ships, and this script is not needed to get it
 
-It is no longer in the repository either. `build_mhc_tables.py` rebuilds it from
-`data/mhc_mapping/mhc_sources.csv`, which names the four-field allele behind each row, and that path
-reproduces every row the models use byte for byte. Run that script, not this one, unless you are
-re-deriving stage 0.
+Anthony Nolan granted permission on 2026-09-24 to redistribute the processed chain sequences, so
+`data/mhc_mapping/` is in the repository. `mhc_sources.csv` beside it names the four-field
+IPD-IMGT/HLA allele behind each row, so any row can be traced back to release 3.59.0 or re-cut from
+the alignment this script fetches. Run this only if you are re-deriving stage 0.
 """
 import argparse
 import collections
